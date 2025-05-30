@@ -64,8 +64,8 @@ PORT=3000
 POSTGRES_HOST=localhost
 POSTGRES_PORT=5432
 POSTGRES_USER=postgres
-POSTGRES_PASS=your_pg_password
-POSTGRES_NAME=nextrep
+POSTGRES_PASSWORD=your_pg_password
+POSTGRES_DB=nextrep
 ```
 
 ### Start server
