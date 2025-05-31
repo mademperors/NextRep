@@ -12,7 +12,7 @@ Creates a new migration file based on changes in the provided entities.
 yarn migration:generate src/database/migrations/YourMigrationName
 ```
 
-> ✅ Make sure `loadDataSourceConfig()` in `data-source.ts` only includes entities you want to track.
+> ✅ Make sure `MigrationsDataSourceConfig` in `migrations-data-source.config.ts` only includes entities you want to track.
 
 ---
 
@@ -31,15 +31,15 @@ yarn migration:run
 Rolls back the most recently executed migration.
 
 ```bash
-yarn typeorm migration:revert -d ./src/database/data-source.ts
+yarn migration:revert
 ```
 
 ---
 
 ### 4. **Notes**
 
-- Migrations are located in `src/database/migrations/`.
-- To customize which entities are tracked for migration generation, adjust the `entities` array in `loadDataSourceConfig()`.
+- Migrations are located in `src/database/migrations`.
+- To customize which entities are tracked for migration generation, adjust the `entities` array in `MigrationsDataSourceConfig`.
 - Make sure your `.env` contains the correct database connection credentials.
 
 ---
@@ -61,11 +61,12 @@ Create .env file in backend directory and fill with values e.g. .env.example
 ```bash
 HOST=localhost
 PORT=3000
-POSTGRES_HOST=localhost
-POSTGRES_PORT=5432
-POSTGRES_USER=postgres
-POSTGRES_PASSWORD=your_pg_password
-POSTGRES_DB=nextrep
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=postgres
+DB_PASSWORD=your_pg_password
+DB_NAME=nextrep
+JWT_SECRET=yout_jwt_secret
 ```
 
 ### Start server
