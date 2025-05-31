@@ -8,6 +8,10 @@ async function bootstrap() {
   app.setGlobalPrefix('NextRep/api');
   // app.useGlobalPipes(new ValidationPipe()); //
 
+  // app.enableCors({
+  //   origin: '',
+  //   credentials: true,
+  // });
   app.use(cookieParser());
 
   const host = process.env.HOST ?? 3001;
