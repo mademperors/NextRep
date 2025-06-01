@@ -17,6 +17,12 @@ export class AuthController {
     this.authService.sendCookie(res, jwtToken);
   }
 
+  @HttpCode(HttpStatus.OK)
+  @Post('logout')
+  logout(@Res({ passthrough: true }) res: Response) {
+    this.authService.clearCookie(res);
+  }
+
   //dev endpoint
   @Get('status')
   status(@Req() req) {

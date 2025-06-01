@@ -1,19 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { InjectRepository } from '@nestjs/typeorm';
 import { Response } from 'express';
-import { User } from 'src/database/entities/user.entity';
-import { Repository } from 'typeorm';
+import { UsersRepository } from 'src/repositories/users/users.service';
 
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectRepository(User) private userRepository: Repository<User>,
+    private readonly userRepository: UsersRepository,
     private jwtService: JwtService,
   ) {}
 
   async validateLocal(payloadEmail: string, payloadPassword: string, role: string) {
-    const foundUser = await this._findUserByEmail(payloadEmail);
+    const foundUser = await this.userRepository.findOneBy({ email: payloadEmail });
     if (!foundUser) return null;
 
     if (foundUser.password !== payloadPassword) return null;
@@ -42,7 +40,11 @@ export class AuthService {
     });
   }
 
-  private async _findUserByEmail(email: string) {
-    return this.userRepository.findOneBy({ email });
+  clearCookie(res: Response) {
+    res.clearCookie('jwt', {
+      httpOnly: true,
+      sameSite: 'lax',
+      path: '/NextRep/api',
+    });
   }
 }
