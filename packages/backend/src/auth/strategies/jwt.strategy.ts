@@ -13,11 +13,12 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       secretOrKey: process.env.JWT_SECRET || 'defaultSecret',
     });
   }
-  async validate(payload) {
-    // add roles later
-    const user = await this.authService.validateJwt(payload);
+
+  async validate(payload: Record<string, any>) {
+    const { role, ...payloadUser } = payload;
+    const user = await this.authService.validateJwt(payloadUser);
     if (!user) throw new UnauthorizedException();
 
-    return payload;
+    return { ...user, role: payload.role };
   }
 }

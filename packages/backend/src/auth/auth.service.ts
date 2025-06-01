@@ -12,20 +12,25 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async validate(payloadEmail: string, payloadPassword: string) {
+  async validateLocal(payloadEmail: string, payloadPassword: string, role: string) {
     const foundUser = await this._findUserByEmail(payloadEmail);
     if (!foundUser) return null;
 
     if (foundUser.password !== payloadPassword) return null;
 
-    const { password, ...user } = foundUser;
-    return this.jwtService.sign(user);
+    const { id, password, ...user } = foundUser;
+    return this.jwtService.sign({ ...user, role }, { subject: String(id) });
   }
 
   async validateJwt(payload: Record<string, any>) {
-    const foundUser = await this._findUserByEmail(payload.email);
+    const foundUser = await this.userRepository.findOneBy({
+      id: payload.sub,
+      email: payload.email,
+    });
     if (!foundUser) return null;
-    return foundUser;
+
+    const { password, ...safeUser } = foundUser;
+    return safeUser;
   }
 
   sendCookie(res: Response, jwtToken: string) {
