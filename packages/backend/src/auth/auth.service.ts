@@ -1,12 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Response } from 'express';
-import { UsersRepository } from 'src/repositories/users/users.service';
+import { CreateMemberDto } from 'src/repositories/members/dtos/create-member.dto';
+import { MembersRepository } from 'src/repositories/members/member.repository';
+import { cookieConfig } from './utils/cookie.config';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly userRepository: UsersRepository,
+    private readonly userRepository: MembersRepository,
     private jwtService: JwtService,
   ) {}
 
@@ -20,7 +22,7 @@ export class AuthService {
     return this.jwtService.sign({ ...user, role }, { subject: String(id) });
   }
 
-  async validateJwt(payload: Record<string, any>) {
+  async validateJwt(payload: Record<string, string | number>) {
     const foundUser = await this.userRepository.findOneBy({
       id: payload.sub,
       email: payload.email,
@@ -32,19 +34,14 @@ export class AuthService {
   }
 
   sendCookie(res: Response, jwtToken: string) {
-    res.cookie('jwt', jwtToken, {
-      httpOnly: true,
-      maxAge: 1000 * 60 * 15, //15 minutes
-      sameSite: 'lax',
-      path: '/NextRep/api',
-    });
+    res.cookie('jwt', jwtToken, cookieConfig);
   }
 
   clearCookie(res: Response) {
-    res.clearCookie('jwt', {
-      httpOnly: true,
-      sameSite: 'lax',
-      path: '/NextRep/api',
-    });
+    res.clearCookie('jwt', cookieConfig);
+  }
+
+  signUp(dto: CreateMemberDto) {
+    this.userRepository.create(dto);
   }
 }
