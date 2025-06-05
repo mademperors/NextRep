@@ -4,7 +4,17 @@
 
 ## 🛠️ How to Use Migrations (TypeORM)
 
-### 1. **Generate a migration**
+### 1. **Create an empty migration**
+
+Creates an empty migration
+
+```bash
+yarn migration:create src/database/migrations/YourMigrationName
+```
+
+---
+
+### 2. **Generate a migration**
 
 Creates a new migration file based on changes in the provided entities.
 
@@ -16,7 +26,7 @@ yarn migration:generate src/database/migrations/YourMigrationName
 
 ---
 
-### 2. **Run pending migrations**
+### 3. **Run pending migrations**
 
 Executes all migrations that haven't been run yet.
 
@@ -26,7 +36,7 @@ yarn migration:run
 
 ---
 
-### 3. **Revert the last migration**
+### 4. **Revert the last migration**
 
 Rolls back the most recently executed migration.
 
@@ -36,7 +46,7 @@ yarn migration:revert
 
 ---
 
-### 4. **Notes**
+### 5. **Notes**
 
 - Migrations are located in `src/database/migrations`.
 - To customize which entities are tracked for migration generation, adjust the `entities` array in `MigrationsDataSourceConfig`.

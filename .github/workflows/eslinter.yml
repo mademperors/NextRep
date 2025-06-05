@@ -1,0 +1,31 @@
+name: Node.js linter on main pushes
+
+permissions:
+  contents: read
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+          cache: yarn
+          cache-dependency-path: packages/backend/yarn.lock
+
+      - name: Install dependencies
+        run: |
+          cd packages/backend
+          yarn install
+
+      - name: Run lint
+        run: |
+          cd packages/backend
+          yarn lint

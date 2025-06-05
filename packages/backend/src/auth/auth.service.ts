@@ -18,6 +18,7 @@ export class AuthService {
 
     if (foundUser.password !== payloadPassword) return null;
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { id, password, ...user } = foundUser;
     return this.jwtService.sign({ ...user, role }, { subject: String(id) });
   }
@@ -29,6 +30,7 @@ export class AuthService {
     });
     if (!foundUser) return null;
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, ...safeUser } = foundUser;
     return safeUser;
   }
