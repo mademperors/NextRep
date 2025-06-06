@@ -13,6 +13,7 @@ import { Response } from 'express';
 import { CreateMemberDto } from 'src/repositories/members/dtos/create-member.dto';
 import { AuthService } from './auth.service';
 import { Public } from './decorators/public.decorator';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 
 @Controller('auth')
@@ -22,23 +23,24 @@ export class AuthController {
   @Public()
   @HttpCode(HttpStatus.OK)
   @UseGuards(LocalAuthGuard)
-  @Post('signin')
-  signIn(@Req() req, @Res({ passthrough: true }) res: Response) {
+  @Post('signIn')
+  signIn(@Req() req, @Res({ passthrough: true }) res: Response): void {
     const jwtToken = req.user;
     this.authService.sendCookie(res, jwtToken);
   }
 
   @HttpCode(HttpStatus.OK)
-  @Post('signout')
-  signOut(@Res({ passthrough: true }) res: Response) {
+  @UseGuards(JwtAuthGuard)
+  @Post('signOut')
+  signOut(@Res({ passthrough: true }) res: Response): void {
     this.authService.clearCookie(res);
   }
 
   @Public()
   @HttpCode(HttpStatus.OK)
-  @Post('signup')
-  signUp(@Body() createUserDto: CreateMemberDto) {
-    this.authService.signUp(createUserDto);
+  @Post('signUp')
+  async signUp(@Body() createUserDto: CreateMemberDto): Promise<void> {
+    await this.authService.signUp(createUserDto);
   }
 
   //dev endpoint

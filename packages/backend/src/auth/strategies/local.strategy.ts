@@ -2,8 +2,8 @@ import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/
 import { PassportStrategy } from '@nestjs/passport';
 import { Request } from 'express';
 import { Strategy } from 'passport-local';
+import { Role } from '../../constants/enums/roles.enum';
 import { AuthService } from '../auth.service';
-import { Role } from '../utils/roles.enum';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
@@ -15,10 +15,14 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(req: Request, email: string, password: string) {
-    const role = req.body.role;
+    const role: Role = req.body.role;
     if (!Object.values(Role).includes(role)) throw new BadRequestException();
 
-    const logged = await this.authService.validateLocal(email, password, role);
+    const logged = await this.authService.validateLocal({
+      email,
+      password,
+      role,
+    });
     if (!logged) throw new UnauthorizedException();
 
     return logged;

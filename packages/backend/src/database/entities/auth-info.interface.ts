@@ -8,6 +8,6 @@ export class AuthInfo {
   })
   email: string;
 
-  @Column('varchar')
+  @Column('varchar', { length: 100 })
   password: string;
 }
