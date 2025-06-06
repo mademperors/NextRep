@@ -4,6 +4,7 @@ import { Request } from 'express';
 import { Strategy } from 'passport-local';
 import { Role } from '../../constants/enums/roles.enum';
 import { AuthService } from '../auth.service';
+import { AuthDto } from '../dtos/auth.dto';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
@@ -18,11 +19,8 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     const role: Role = req.body.role;
     if (!Object.values(Role).includes(role)) throw new BadRequestException();
 
-    const logged = await this.authService.validateLocal({
-      email,
-      password,
-      role,
-    });
+    const loginDto: AuthDto = { email, password, role };
+    const logged = await this.authService.validateLocal(loginDto);
     if (!logged) throw new UnauthorizedException();
 
     return logged;

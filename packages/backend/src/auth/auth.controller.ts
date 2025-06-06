@@ -10,9 +10,9 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { Response } from 'express';
-import { CreateMemberDto } from 'src/repositories/members/dtos/create-member.dto';
 import { AuthService } from './auth.service';
 import { Public } from './decorators/public.decorator';
+import { AuthDto } from './dtos/auth.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 
@@ -39,8 +39,8 @@ export class AuthController {
   @Public()
   @HttpCode(HttpStatus.OK)
   @Post('signUp')
-  async signUp(@Body() createUserDto: CreateMemberDto): Promise<void> {
-    await this.authService.signUp(createUserDto);
+  async signUp(@Body() createAccountDto: AuthDto): Promise<void> {
+    await this.authService.signUp(createAccountDto);
   }
 
   //dev endpoint

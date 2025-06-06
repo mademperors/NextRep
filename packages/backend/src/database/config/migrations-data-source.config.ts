@@ -1,4 +1,5 @@
-import { DataSourceOptions } from 'typeorm';
+import { Admin, DataSourceOptions } from 'typeorm';
+import { Member } from '../entities/member.entity';
 import { BasePostgresConfig } from './base-postgres.config';
 
 export class MigrationsDataSourceConfig extends BasePostgresConfig {
@@ -8,7 +9,7 @@ export class MigrationsDataSourceConfig extends BasePostgresConfig {
 
   constructor(env: NodeJS.ProcessEnv = process.env) {
     super(env);
-    this.entities = [];
+    this.entities = [Member, Admin];
     this.migrations = ['src/database/migrations/*.ts'];
     this.migrationsRun = false;
   }

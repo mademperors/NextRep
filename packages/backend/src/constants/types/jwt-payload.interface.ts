@@ -1,7 +1,7 @@
 import { Role } from '../enums/roles.enum';
 
-export interface LoginDto {
+export interface JwtPayload {
   email: string;
-  password: string;
   role: Role;
+  sub: string;
 }

@@ -1,34 +1,37 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Response } from 'express';
+import { AuthDto } from 'src/auth/dtos/auth.dto';
 import { comparePasswords } from 'src/common/utils/bcrypt';
-import { JwtPayload } from 'src/constants/types/jwt-payload.dto';
-import { LoginDto } from 'src/constants/types/login.dto';
+import { JwtPayload } from 'src/constants/types/jwt-payload.interface';
 import { Member } from 'src/database/entities/member.entity';
-import { CreateMemberDto } from 'src/repositories/members/dtos/create-member.dto';
-import { MembersRepository } from 'src/repositories/members/member.repository';
+import { AuthFactory } from 'src/repositories/factories/auth.factory';
 import { cookieConfig } from './configs/cookie.config';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly userRepository: MembersRepository,
-    private jwtService: JwtService,
+    private readonly authFactory: AuthFactory,
+    private readonly jwtService: JwtService,
   ) {}
 
-  async validateLocal(loginDto: LoginDto): Promise<string | null> {
-    const foundUser = await this.userRepository.findOneBy({ email: loginDto.email });
+  async validateLocal(loginDto: AuthDto): Promise<string | null> {
+    const repository = this.authFactory.getRepository(loginDto.role);
+
+    const foundUser = await repository.findOne({ email: loginDto.email });
     if (!foundUser) return null;
 
     if (!comparePasswords(loginDto.password, foundUser.password)) return null;
 
-    const payload: JwtPayload = { email: foundUser.email, role: loginDto.role };
+    const payload = { email: foundUser.email, role: loginDto.role };
     return this.jwtService.sign(payload, { subject: String(foundUser.id) });
   }
 
-  async validateJwt(payload: Record<string, string | number>): Promise<Partial<Member> | null> {
-    const foundUser = await this.userRepository.findOneBy({
-      id: payload.sub,
+  async validateJwt(payload: JwtPayload): Promise<Partial<Member> | null> {
+    const repository = this.authFactory.getRepository(payload.role);
+
+    const foundUser = await repository.findOne({
+      id: +payload.sub,
       email: payload.email,
     });
     if (!foundUser) return null;
@@ -46,9 +49,11 @@ export class AuthService {
     res.clearCookie('jwt', cookieConfig);
   }
 
-  async signUp(dto: CreateMemberDto): Promise<void> {
+  async signUp(dto: AuthDto): Promise<void> {
     try {
-      await this.userRepository.create(dto);
+      const { role, ...data } = dto;
+      const repository = this.authFactory.getRepository(role);
+      await repository.create(data);
     } catch (err) {
       if (err.code === '23505') throw new ConflictException();
       else throw err;
