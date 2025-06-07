@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsIn, IsInt, IsNotEmpty, IsOptional, IsString, Length, Min } from 'class-validator';
+import { IsEmail, IsIn, IsInt, IsNotEmpty, IsOptional, IsString, Min } from 'class-validator';
 
 export class CreateChallengeDto {
   @IsNotEmpty({ message: 'Duration is required.' })
@@ -14,12 +14,10 @@ export class CreateChallengeDto {
 
   @IsNotEmpty({ message: 'Challenge type is required.' })
   @IsString({ message: 'Challenge type must be a string.' })
-  @Length(3, 50, { message: 'Challenge type must be between 3 and 50 characters.' })
   @IsIn(['private', 'group', 'global'])
   challenge_type: string;
 
   @IsOptional()
-  @IsInt({ message: 'challengeCreatorId must be an integer.' })
-  @Type(() => Number)
-  challengeCreatorId?: number;
+  @IsEmail()
+  createdByEmail?: string;
 }
