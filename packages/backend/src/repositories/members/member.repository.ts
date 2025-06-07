@@ -3,11 +3,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { encodePassword } from 'src/common/utils/bcrypt';
 import { Member } from 'src/database/entities/member.entity';
 import { Repository } from 'typeorm';
-import { IREST } from '../interfaces/irest.interface';
 import { CreateMemberDto } from './dtos/create-member.dto';
+import { ICRUD } from '../interfaces/icrud.interface';
 
 @Injectable()
-export class MembersRepository implements IREST<Member, CreateMemberDto> {
+export class MembersRepository implements ICRUD<Member, CreateMemberDto> {
   constructor(@InjectRepository(Member) private readonly usersRepository: Repository<Member>) {}
 
   async findOne(options: Record<string, string | number>): Promise<Member | null> {
