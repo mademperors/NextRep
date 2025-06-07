@@ -1,4 +1,17 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
+import { Roles } from 'src/auth/decorators/roles.decorator';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { Role } from 'src/constants/enums/roles.enum';
 import { ChallengesRepository } from './challenges.repository';
 import { CreateChallengeDto } from './dto/create-challenge.dto';
 import { UpdateChallengeDto } from './dto/update-challenge.dto';
@@ -12,6 +25,8 @@ export class ChallengesController {
     return await this.challengesRepository.create(createChallengeDto);
   }
 
+  @UseGuards(RolesGuard)
+  @Roles(Role.ADMIN)
   @Post('/global') // available for admins
   async createGlobal(@Body() createChallengeDto: CreateChallengeDto) {
     return await this.challengesRepository.createGlobal(createChallengeDto);
@@ -42,6 +57,8 @@ export class ChallengesController {
     return await this.challengesRepository.delete(+id, createdBy);
   }
 
+  @UseGuards(RolesGuard)
+  @Roles(Role.ADMIN)
   @Delete(':id/global') // available for admins
   async deleteGlobal(@Param('id') id: string) {
     return await this.challengesRepository.deleteGlobal(+id);
