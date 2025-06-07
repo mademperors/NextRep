@@ -1,9 +1,9 @@
 import { DataSourceOptions } from 'typeorm';
+import { Admin } from '../entities/admin.entity';
 import { Challenge } from '../entities/challenge.entity';
 import { Member } from '../entities/member.entity';
 import { MemberChallenge } from '../entities/memberChallenge.entity';
 import { BasePostgresConfig } from './base-postgres.config';
-import { Admin } from '../entities/admin.entity';
 
 export class MigrationsDataSourceConfig extends BasePostgresConfig {
   readonly entities: DataSourceOptions['entities'];

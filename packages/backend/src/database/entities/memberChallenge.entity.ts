@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 import { Challenge } from './challenge.entity';
 import { Member } from './member.entity';
 
@@ -7,17 +7,17 @@ export class MemberChallenge {
   @PrimaryColumn()
   member_email: string;
 
-  @PrimaryColumn()
-  challenge_id: number;
-
-  @Column({ type: 'integer', nullable: false })
-  duration: number;
-
-  @ManyToOne(() => Member, (member) => member.memberChallenges, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Member, (member) => member.email, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'member_email', referencedColumnName: 'email' })
   member: Member;
 
-  @ManyToOne(() => Challenge, (challenge) => challenge.memberChallenges, { onDelete: 'CASCADE' })
+  @PrimaryColumn()
+  challenge_id: number;
+
+  @ManyToOne(() => Challenge, (challenge) => challenge.challenge_id, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'challenge_id', referencedColumnName: 'challenge_id' })
   challenge: Challenge;
+
+  @Column({ type: 'integer', nullable: false })
+  duration: number;
 }

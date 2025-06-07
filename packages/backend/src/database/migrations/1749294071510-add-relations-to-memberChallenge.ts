@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class ChangeMemberChallengeDecorators1749232446519 implements MigrationInterface {
-    name = 'ChangeMemberChallengeDecorators1749232446519'
+export class AddRelationsToMemberChallenge1749294071510 implements MigrationInterface {
+    name = 'AddRelationsToMemberChallenge1749294071510'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`ALTER TABLE "member_challenge" ADD CONSTRAINT "FK_198d7b7a6ea5881dc6bba897565" FOREIGN KEY ("member_email") REFERENCES "member"("email") ON DELETE CASCADE ON UPDATE NO ACTION`);
