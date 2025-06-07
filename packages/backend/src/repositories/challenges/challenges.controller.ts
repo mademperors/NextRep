@@ -1,5 +1,5 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Query } from '@nestjs/common';
-import { ChallengesService as ChallengesRepository } from './challenges.service';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
+import { ChallengesRepository } from './challenges.repository';
 import { CreateChallengeDto } from './dto/create-challenge.dto';
 import { UpdateChallengeDto } from './dto/update-challenge.dto';
 
@@ -7,44 +7,43 @@ import { UpdateChallengeDto } from './dto/update-challenge.dto';
 export class ChallengesController {
   constructor(private readonly challengesRepository: ChallengesRepository) {}
 
-  @Post()
-  create(@Body() createChallengeDto: CreateChallengeDto) {
-    return this.challengesRepository.create(createChallengeDto);
+  @Post() // available only for members
+  async create(@Body() createChallengeDto: CreateChallengeDto) {
+    return await this.challengesRepository.create(createChallengeDto);
   }
 
-  @Post("/global")
-  createGlobal(@Body() createChallengeDto: CreateChallengeDto) {
-    return this.challengesRepository.createGlobal(createChallengeDto);
+  @Post('/global') // available for admins
+  async createGlobal(@Body() createChallengeDto: CreateChallengeDto) {
+    return await this.challengesRepository.createGlobal(createChallengeDto);
   }
 
   @Get()
-  findAll() {
-    return this.challengesRepository.findAll();
+  async findAll() {
+    return await this.challengesRepository.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.challengesRepository.findOne(+id);
+  async findOne(@Param('id') id: string) {
+    return await this.challengesRepository.findOne(+id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateChallengeDto: UpdateChallengeDto) {
-    return this.challengesRepository.update(+id, updateChallengeDto);
+  async update(@Param('id') id: string, @Body() updateChallengeDto: UpdateChallengeDto) {
+    return await this.challengesRepository.update(+id, updateChallengeDto);
   }
 
   @Patch(':id/newMember')
-  updateNewMember(@Param('id') id: string,  
-    @Query('memberId') memberId: string ) {
-    return this.challengesRepository.updateNewMember(+id, memberId);
+  async addNewMember(@Param('id') id: string, @Query('memberEmail') memberEmail: string) {
+    return await this.challengesRepository.addNewMember(+id, memberEmail);
   }
 
   @Delete(':id')
-  delete(@Param('id') id: string) {
-    return this.challengesRepository.delete(+id);
+  async delete(@Param('id') id: string, @Query('createdBy') createdBy: string) {
+    return await this.challengesRepository.delete(+id, createdBy);
   }
 
-  @Delete(':id/global')
-  deleteGlobal(@Param('id') id: string) {
-    return this.challengesRepository.deleteGlobal(+id);
+  @Delete(':id/global') // available for admins
+  async deleteGlobal(@Param('id') id: string) {
+    return await this.challengesRepository.deleteGlobal(+id);
   }
 }
