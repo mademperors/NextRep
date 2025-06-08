@@ -17,5 +17,5 @@ export class Challenge {
 
   @ManyToOne(() => Member, (member) => member.email, { onDelete: 'CASCADE' })
   @JoinColumn({ referencedColumnName: 'email' })
-  createdBy: Member["email"];
+  createdBy: Member;
 }
