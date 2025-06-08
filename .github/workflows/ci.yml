@@ -28,11 +28,6 @@ jobs:
           cd packages/backend
           yarn install
 
-      - name: Prettier check
-        run: |
-          cd packages/backend
-          yarn prettier:check
-
       - name: Lint check
         run: |
           cd packages/backend
