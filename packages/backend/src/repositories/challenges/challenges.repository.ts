@@ -148,7 +148,7 @@ export class ChallengesRepository implements IREST<Challenge, CreateChallengeDto
 
     if (!createdBy || (createdBy && createdBy !== challenge.createdBy?.email)) {
       throw new BadRequestException(
-        `You are not authorized to delete this challenge. Created by: ${challenge.createdBy.email}`,
+        `You are not authorized to delete this challenge.`,
       );
     }
 

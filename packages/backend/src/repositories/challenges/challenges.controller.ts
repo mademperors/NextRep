@@ -8,6 +8,7 @@ import {
   Patch,
   Post,
   Query,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import { Roles } from 'src/auth/decorators/roles.decorator';
@@ -44,18 +45,24 @@ export class ChallengesController {
   }
 
   @Patch(':id')
-  async update(@Param('id', ParseIntPipe) id: number, @Body() updateChallengeDto: UpdateChallengeDto) {
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateChallengeDto: UpdateChallengeDto,
+  ) {
     return await this.challengesRepository.update(id, updateChallengeDto);
   }
 
   @Patch(':id/newMember')
-  async addNewMember(@Param('id', ParseIntPipe) id: number, @Query('memberEmail') memberEmail: string) {
+  async addNewMember(
+    @Param('id', ParseIntPipe) id: number,
+    @Query('memberEmail') memberEmail: string,
+  ) {
     return await this.challengesRepository.addNewMember(id, memberEmail);
   }
 
   @Delete(':id')
-  async delete(@Param('id', ParseIntPipe) id: number, @Query('createdBy') createdBy: string) {
-    return await this.challengesRepository.delete(id, createdBy);
+  async delete(@Param('id', ParseIntPipe) id: number, @Req() req) {
+    return await this.challengesRepository.delete(id, req.user.email);
   }
 
   @UseGuards(RolesGuard)
