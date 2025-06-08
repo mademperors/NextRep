@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
   Query,
@@ -38,8 +39,8 @@ export class ChallengesController {
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string) {
-    return await this.challengesRepository.findOne(+id);
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    return await this.challengesRepository.findOne({ challenge_id: id });
   }
 
   @Patch(':id')

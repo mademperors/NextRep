@@ -136,14 +136,14 @@ export class ChallengesRepository {
     return responseChallenges;
   }
 
-  async findOne(challengeId: number): Promise<ResponseChallengeDto> {
+  async findOne(options: Record<string, string | number>): Promise<ResponseChallengeDto> {
     const challenge = await this.challengeRepository.findOne({
-      where: { challenge_id: challengeId },
+      where: options,
       relations: ['createdBy'],
     });
 
     if (!challenge) {
-      throw new BadRequestException(`Challenge with id ${challengeId} does not exist`);
+      throw new BadRequestException(`Challenge with this options does not exist`);
     }
 
     const allmemberChallenge = await this.membersChallengeRepository.find({
@@ -177,7 +177,7 @@ export class ChallengesRepository {
     const updatedChallenge = Object.assign(challenge, updateChallengeDto);
     await this.challengeRepository.save(updatedChallenge);
 
-    return await this.findOne(challengeId);
+    return await this.findOne({ challenge_id: challengeId });
   }
 
   async delete(challengeId: number, createdBy?: string): Promise<Challenge> {
