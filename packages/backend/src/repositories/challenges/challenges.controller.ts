@@ -44,6 +44,11 @@ export class ChallengesController {
     return await this.challengesRepository.findOne({ challenge_id: id });
   }
 
+  @Get(':id/members')
+  async findMembers(@Param('id', ParseIntPipe) id: number) {
+    return await this.challengesRepository.findMembers(id);
+  }
+
   @Patch(':id')
   async update(
     @Param('id', ParseIntPipe) id: number,

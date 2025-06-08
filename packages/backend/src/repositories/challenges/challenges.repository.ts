@@ -10,6 +10,16 @@ import { UpdateChallengeDto } from './dto/update-challenge.dto';
 
 @Injectable()
 export class ChallengesRepository implements IREST<Challenge, CreateChallengeDto> {
+  async findMembers(challenge_id: number): Promise<String[]> {
+    const memberChallenges = await this.membersChallengeRepository.find({
+      where: { challenge_id },
+      relations: ['member'],
+    });
+
+    return memberChallenges.map((memberChallenge) => {
+      return memberChallenge.member.email;
+    });
+  }
   constructor(
     @InjectRepository(Challenge) private readonly challengeRepository: Repository<Challenge>,
     @InjectRepository(MemberChallenge)
@@ -147,9 +157,7 @@ export class ChallengesRepository implements IREST<Challenge, CreateChallengeDto
     }
 
     if (!createdBy || (createdBy && createdBy !== challenge.createdBy?.email)) {
-      throw new BadRequestException(
-        `You are not authorized to delete this challenge.`,
-      );
+      throw new BadRequestException(`You are not authorized to delete this challenge.`);
     }
 
     return await this.deleteGlobal(challengeId);
