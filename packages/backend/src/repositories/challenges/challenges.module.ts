@@ -8,8 +8,7 @@ import { ChallengesRepository } from './challenges.repository';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Challenge]),
-    TypeOrmModule.forFeature([MemberChallenge]),
+    TypeOrmModule.forFeature([Challenge, MemberChallenge]),
     MembersModule,
   ],
   controllers: [ChallengesController],
