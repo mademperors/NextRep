@@ -3,13 +3,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Challenge } from 'src/database/entities/challenge.entity';
 import { MemberChallenge } from 'src/database/entities/memberChallenge.entity';
 import { Repository } from 'typeorm';
+import { IREST } from '../interfaces/irest.interface';
 import { MembersRepository } from '../members/member.repository';
 import { CreateChallengeDto } from './dto/create-challenge.dto';
 import { ResponseChallengeDto } from './dto/responce-challenge.dto';
 import { UpdateChallengeDto } from './dto/update-challenge.dto';
 
 @Injectable()
-export class ChallengesRepository {
+export class ChallengesRepository implements IREST<Challenge, CreateChallengeDto> {
   constructor(
     @InjectRepository(Challenge) private readonly challengeRepository: Repository<Challenge>,
     @InjectRepository(MemberChallenge)
@@ -83,7 +84,7 @@ export class ChallengesRepository {
     return await this.challengeRepository.remove(challenge);
   }
 
-  async create(createChallengeDto: CreateChallengeDto): Promise<ResponseChallengeDto> {
+  async create(createChallengeDto: CreateChallengeDto): Promise<Challenge | void> {
     if (!createChallengeDto.createdByEmail) {
       throw new BadRequestException('createdByEmail is required');
     }
@@ -99,17 +100,8 @@ export class ChallengesRepository {
     }
 
     const newChallenge = await this.challengeRepository.create(createChallengeDto);
-    newChallenge.createdBy = memberByEmail;
-    const savedChallenge = await this.challengeRepository.save(newChallenge);
-
-    const response = new ResponseChallengeDto();
-    response.challenge_id = savedChallenge.challenge_id;
-    response.duration = savedChallenge.duration;
-    response.challenge_info = savedChallenge.challenge_info;
-    response.challenge_type = savedChallenge.challenge_type;
-    response.createdByEmail = memberByEmail.email;
-    response.members = [];
-    return response;
+    newChallenge.createdBy = memberByEmail.email;
+    return await this.challengeRepository.save(newChallenge);
   }
 
   async findAll(): Promise<ResponseChallengeDto[]> {
@@ -125,7 +117,7 @@ export class ChallengesRepository {
       response.duration = challenge.duration;
       response.challenge_info = challenge.challenge_info;
       response.challenge_type = challenge.challenge_type;
-      response.createdByEmail = challenge.createdBy?.email || '';
+      response.createdByEmail = challenge.createdBy;
 
       response.members = allmemberChallenge
         .filter((memberChallenge) => memberChallenge.challenge_id === challenge.challenge_id)
@@ -136,37 +128,17 @@ export class ChallengesRepository {
     return responseChallenges;
   }
 
-  async findOne(options: Record<string, string | number>): Promise<ResponseChallengeDto> {
-    const challenge = await this.challengeRepository.findOne({
+  async findOne(options: Record<string, string | number>): Promise<Challenge | null> {
+    return await this.challengeRepository.findOne({
       where: options,
       relations: ['createdBy'],
     });
-
-    if (!challenge) {
-      throw new BadRequestException(`Challenge with this options does not exist`);
-    }
-
-    const allmemberChallenge = await this.membersChallengeRepository.find({
-      where: { challenge_id: challenge.challenge_id },
-    });
-
-    const response = new ResponseChallengeDto();
-    response.challenge_id = challenge.challenge_id;
-    response.duration = challenge.duration;
-    response.challenge_info = challenge.challenge_info;
-    response.challenge_type = challenge.challenge_type;
-    response.createdByEmail = challenge.createdBy?.email || '';
-
-    response.members = allmemberChallenge
-      .filter((memberChallenge) => memberChallenge.challenge_id === challenge.challenge_id)
-      .map((memberChallenge) => memberChallenge.member_email);
-    return response;
   }
 
   async update(
     challengeId: number,
     updateChallengeDto: UpdateChallengeDto,
-  ): Promise<ResponseChallengeDto> {
+  ): Promise<Challenge | null> {
     const challenge = await this.challengeRepository.findOne({
       where: { challenge_id: challengeId },
     });
@@ -190,9 +162,9 @@ export class ChallengesRepository {
       throw new BadRequestException(`Challenge with id ${challengeId} does not exist`);
     }
 
-    if (!createdBy || (createdBy && createdBy !== challenge.createdBy?.email)) {
+    if (!createdBy || (createdBy && createdBy !== challenge.createdBy)) {
       throw new BadRequestException(
-        `You are not authorized to delete this challenge. Created by: ${challenge.createdBy?.email}`,
+        `You are not authorized to delete this challenge. Created by: ${challenge.createdBy}`,
       );
     }
 
