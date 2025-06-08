@@ -43,8 +43,8 @@ export class AuthController {
     await this.authService.signUp(createAccountDto);
   }
 
-  //dev endpoint
-  @Get('status')
+  //for front jwt parsing
+  @Get('me')
   status(@Req() req) {
     return req.user;
   }

@@ -1,7 +1,14 @@
-export interface ICRUD<Entity, CreateDto = unknown, UpdateDto = unknown> {
-  findOne(options: Partial<Entity>): Promise<Entity | null>;
-  find(options: Partial<Entity>): Promise<Array<Entity>>;
-  create(dto: CreateDto): Promise<Entity | void>;
-  update(email: string, dto: UpdateDto): Promise<Entity>;
+export interface ICRUD<
+  Entity,
+  Dtos extends {
+    CreateDto?: unknown;
+    UpdateDto?: unknown;
+    ResponseDto?: unknown;
+  } = Record<string, unknown>,
+> {
+  findOne(options: Partial<Entity>): Promise<Dtos['ResponseDto']>;
+  find(options: Partial<Entity>): Promise<Dtos['ResponseDto'][]>;
+  create(dto: Dtos['CreateDto']): Promise<Dtos['ResponseDto'] | void>;
+  update(email: string, dto: Dtos['UpdateDto']): Promise<Dtos['ResponseDto']>;
   delete(email: string): Promise<void>;
 }

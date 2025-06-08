@@ -1,14 +1,7 @@
-import { IsEmail, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
+import { Gender } from 'src/common/constants/enums/gender.enum';
 
 export class UpdateMemberDto {
-  @IsEmail()
-  @IsOptional()
-  email?: string;
-
-  @IsString()
-  @IsOptional()
-  password?: string;
-
   @IsNumber()
   @IsOptional()
   weight?: number; //kg
@@ -17,7 +10,7 @@ export class UpdateMemberDto {
   @IsOptional()
   height?: number; //cm
 
-  @IsNumber()
+  @IsEnum(Gender)
   @IsOptional()
   gender?: number;
 
@@ -32,4 +25,12 @@ export class UpdateMemberDto {
   @IsString()
   @IsOptional()
   additional_info?: string;
+
+  // @IsEmail()
+  @IsOptional()
+  email?: string;
+
+  @IsString()
+  @IsOptional()
+  password?: string;
 }
