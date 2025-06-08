@@ -1,5 +1,5 @@
 import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
-import { Role } from '../../constants/enums/roles.enum';
+import { Role } from '../../common/constants/enums/roles.enum';
 
 export class AuthDto {
   // @IsEmail()

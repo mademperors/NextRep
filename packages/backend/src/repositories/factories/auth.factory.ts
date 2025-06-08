@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { Role } from 'src/constants/enums/roles.enum';
+import { Role } from 'src/common/constants/enums/roles.enum';
 import { AuthInfo } from 'src/database/entities/auth-info.interface';
 import { AdminsRepository } from '../admins/admin.repository';
 import { ICRUD } from '../interfaces/icrud.interface';
