@@ -44,24 +44,24 @@ export class ChallengesController {
   }
 
   @Patch(':id')
-  async update(@Param('id') id: string, @Body() updateChallengeDto: UpdateChallengeDto) {
-    return await this.challengesRepository.update(+id, updateChallengeDto);
+  async update(@Param('id', ParseIntPipe) id: number, @Body() updateChallengeDto: UpdateChallengeDto) {
+    return await this.challengesRepository.update(id, updateChallengeDto);
   }
 
   @Patch(':id/newMember')
-  async addNewMember(@Param('id') id: string, @Query('memberEmail') memberEmail: string) {
-    return await this.challengesRepository.addNewMember(+id, memberEmail);
+  async addNewMember(@Param('id', ParseIntPipe) id: number, @Query('memberEmail') memberEmail: string) {
+    return await this.challengesRepository.addNewMember(id, memberEmail);
   }
 
   @Delete(':id')
-  async delete(@Param('id') id: string, @Query('createdBy') createdBy: string) {
-    return await this.challengesRepository.delete(+id, createdBy);
+  async delete(@Param('id', ParseIntPipe) id: number, @Query('createdBy') createdBy: string) {
+    return await this.challengesRepository.delete(id, createdBy);
   }
 
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN)
   @Delete(':id/global') // available for admins
-  async deleteGlobal(@Param('id') id: string) {
-    return await this.challengesRepository.deleteGlobal(+id);
+  async deleteGlobal(@Param('id', ParseIntPipe) id: number) {
+    return await this.challengesRepository.deleteGlobal(id);
   }
 }
