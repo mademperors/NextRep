@@ -3,14 +3,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Challenge } from 'src/database/entities/challenge.entity';
 import { MemberChallenge } from 'src/database/entities/memberChallenge.entity';
 import { MembersModule } from '../members/member.module';
+import { TrainingsModule } from '../trainings/training.module';
 import { ChallengesController } from './challenges.controller';
 import { ChallengesRepository } from './challenges.repository';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Challenge, MemberChallenge]),
-    MembersModule,
-  ],
+  imports: [TypeOrmModule.forFeature([Challenge, MemberChallenge]), MembersModule, TrainingsModule],
   controllers: [ChallengesController],
   providers: [ChallengesRepository],
   exports: [ChallengesRepository],

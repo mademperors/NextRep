@@ -1,6 +1,6 @@
 import { Type } from 'class-transformer';
 import { IsEmail, IsIn, IsInt, IsNotEmpty, IsOptional, IsString, Min } from 'class-validator';
-import { ChallengeType } from 'src/constants/enums/challenge-types.enum';
+import { ChallengeType } from 'src/common/constants/enums/challenge-types.enum';
 
 export class CreateChallengeDto {
   @IsNotEmpty({ message: 'Duration is required.' })

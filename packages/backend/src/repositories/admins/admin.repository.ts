@@ -23,7 +23,7 @@ export class AdminsRepository implements ICRUD<Admin, Dtos, Param>, IAUTH {
   constructor(@InjectRepository(Admin) private readonly adminsRepository: Repository<Admin>) {}
 
   async findOne(options: FindOptionsWhere<Admin>): Promise<ResponseAdminDto> {
-    const admin = await this.adminsRepository.findOneBy(options);
+    const admin = await this.adminsRepository.findOneByOrFail(options);
     if (!admin) throw new BadRequestException(`Admin not found`);
 
     return plainToInstance(ResponseAdminDto, admin);
