@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Patch, UseGuards } from '@nestjs/common';
-import { SelfGuard } from 'src/common/guards/self.guard';
+import { AccountOwnerGuard } from 'src/common/guards/account-owner.guard';
 import { NotEmptyBodyPipe } from 'src/common/pipes/not-empty-body.pipe';
 import { UpdateMemberDto } from './dtos/update-member.dto';
 import { MembersRepository } from './member.repository';
@@ -13,7 +13,7 @@ export class MembersController {
     return await this.membersRepository.findOne({ email });
   }
 
-  @UseGuards(SelfGuard)
+  @UseGuards(AccountOwnerGuard)
   @Patch('/:email')
   async updateMember(
     @Param('email') email: string,
@@ -22,7 +22,7 @@ export class MembersController {
     return await this.membersRepository.update(email, updateDto);
   }
 
-  @UseGuards(SelfGuard)
+  @UseGuards(AccountOwnerGuard)
   @Delete('/:email')
   async deleteMember(@Param('email') email: string) {
     return await this.membersRepository.delete(email);

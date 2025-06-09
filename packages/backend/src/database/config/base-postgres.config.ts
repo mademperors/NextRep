@@ -10,12 +10,12 @@ export class BasePostgresConfig {
   readonly database: string;
   readonly synchronize: boolean;
 
-  constructor(env: NodeJS.ProcessEnv = process.env) {
-    this.host = env.DB_HOST ?? 'localhost';
-    this.port = Number(env.DB_PORT) || 5432;
-    this.username = env.DB_USER || '';
-    this.password = env.DB_PASSWORD || '';
-    this.database = env.DB_NAME ?? 'nextrep';
+  constructor() {
+    this.host = process.env.DB_HOST ?? 'localhost';
+    this.port = Number(process.env.DB_PORT) || 5432;
+    this.username = process.env.DB_USER || '';
+    this.password = process.env.DB_PASSWORD || '';
+    this.database = process.env.DB_NAME ?? 'nextrep';
     this.synchronize = false;
   }
 

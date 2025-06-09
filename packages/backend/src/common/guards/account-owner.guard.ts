@@ -1,7 +1,7 @@
 import { CanActivate, ExecutionContext, ForbiddenException } from '@nestjs/common';
 import { Request } from 'express';
 
-export class SelfGuard implements CanActivate {
+export class AccountOwnerGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
     const req: Request = context.switchToHttp().getRequest<Request>();
     const user = req.user;
