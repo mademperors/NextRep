@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { ChallengeType } from 'src/constants/enums/challenge-types.enum';
 import { Challenge } from 'src/database/entities/challenge.entity';
 import { MemberChallenge } from 'src/database/entities/memberChallenge.entity';
 import { Repository } from 'typeorm';
@@ -7,7 +8,6 @@ import { IREST } from '../interfaces/irest.interface';
 import { MembersRepository } from '../members/member.repository';
 import { CreateChallengeDto } from './dto/create-challenge.dto';
 import { UpdateChallengeDto } from './dto/update-challenge.dto';
-import { ChallengeType } from 'src/constants/enums/challenge-types.enum';
 
 @Injectable()
 export class ChallengesRepository implements IREST<Challenge, CreateChallengeDto> {
@@ -28,7 +28,7 @@ export class ChallengesRepository implements IREST<Challenge, CreateChallengeDto
     private readonly membersRepository: MembersRepository,
   ) {}
 
-  async addNewMember(challenge_id: number, memberEmail: string): Promise<MemberChallenge> {
+  async enrollToChallege(challenge_id: number, memberEmail: string): Promise<MemberChallenge> {
     const member = await this.membersRepository.findOne({ email: memberEmail });
     if (!member) {
       throw new BadRequestException(`Member with email ${memberEmail} does not exist`);

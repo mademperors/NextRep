@@ -15,8 +15,8 @@ import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Role } from 'src/constants/enums/roles.enum';
 import { ChallengesRepository } from './challenges.repository';
 import { CreateChallengeDto } from './dto/create-challenge.dto';
-import { UpdateChallengeDto } from './dto/update-challenge.dto';
 import { AddMemberDto } from './dto/new-member-in-challenge.dto';
+import { UpdateChallengeDto } from './dto/update-challenge.dto';
 
 @Controller('challenges')
 export class ChallengesController {
@@ -57,9 +57,12 @@ export class ChallengesController {
     return await this.challengesRepository.update(id, updateChallengeDto);
   }
 
-  @Patch(':id/newMember')
-  async addNewMember(@Param('id', ParseIntPipe) id: number, @Body() addMemberDto: AddMemberDto) {
-    return await this.challengesRepository.addNewMember(id, addMemberDto.memberEmail);
+  @Patch(':id/enroll')
+  async enrollToChallege(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() addMemberDto: AddMemberDto,
+  ) {
+    return await this.challengesRepository.enrollToChallege(id, addMemberDto.memberEmail);
   }
 
   @Delete(':id')
