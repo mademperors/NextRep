@@ -1,22 +1,67 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  JoinTable,
+  ManyToMany,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { ChallengeType } from '../../common/constants/enums/challenge-types.enum';
 import { Member } from './member.entity';
-import { ChallengeType } from 'src/constants/enums/challenge-types.enum';
+import { MemberChallenge } from './memberChallenge.entity';
+import { Training } from './training.entity';
 
 @Entity('challenge')
 export class Challenge {
   @PrimaryGeneratedColumn()
-  challenge_id: number;
-
-  @Column({ type: 'integer', nullable: false })
-  duration: number;
+  id: number;
 
   @Column({ type: 'text', nullable: false })
   challenge_info: string;
 
-  @Column({ type: 'varchar', length: 50, nullable: false })
+  @Column('enum', { enum: ChallengeType, nullable: false })
   challenge_type: ChallengeType;
 
-  @ManyToOne(() => Member, (member) => member.email, { onDelete: 'CASCADE' })
-  @JoinColumn({ referencedColumnName: 'email' })
-  createdBy: Member;
+  @Column({ type: 'integer', nullable: false })
+  duration: number;
+
+  @Column({ type: 'integer', nullable: false, default: 1 })
+  current_day: number;
+
+  @ManyToOne(() => Member, { nullable: false, onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'creator', referencedColumnName: 'email' })
+  creator: Member;
+
+  @ManyToMany(() => Training, { cascade: true })
+  @JoinTable({
+    name: 'trainings',
+    joinColumn: {
+      name: 'challenge_id',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'training_id',
+      referencedColumnName: 'id',
+    },
+  })
+  trainings: Training[];
+
+  @ManyToMany(() => Member, { cascade: false })
+  @JoinTable({
+    name: 'enrolled',
+    joinColumn: {
+      name: 'challenge_id',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'member_email',
+      referencedColumnName: 'email',
+    },
+  })
+  enrolled: Member[];
+
+  @OneToMany(() => MemberChallenge, (enrolled) => enrolled.challenge, { cascade: true })
+  enrolledMembers: MemberChallenge[];
 }

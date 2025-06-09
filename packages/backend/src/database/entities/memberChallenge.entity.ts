@@ -7,17 +7,17 @@ export class MemberChallenge {
   @PrimaryColumn()
   member_email: string;
 
-  @ManyToOne(() => Member, (member) => member.email, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Member, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'member_email', referencedColumnName: 'email' })
   member: Member;
 
   @PrimaryColumn()
   challenge_id: number;
 
-  @ManyToOne(() => Challenge, (challenge) => challenge.challenge_id, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'challenge_id', referencedColumnName: 'challenge_id' })
+  @ManyToOne(() => Challenge, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'challenge_id', referencedColumnName: 'id' })
   challenge: Challenge;
 
-  @Column({ type: 'integer', nullable: false })
-  duration: number;
+  @Column('boolean', { array: true, default: () => 'ARRAY[]::BOOLEAN[]' })
+  completed_days: boolean[];
 }
