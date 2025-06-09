@@ -7,6 +7,7 @@ import { IREST } from '../interfaces/irest.interface';
 import { MembersRepository } from '../members/member.repository';
 import { CreateChallengeDto } from './dto/create-challenge.dto';
 import { UpdateChallengeDto } from './dto/update-challenge.dto';
+import { ChallengeType } from 'src/constants/enums/challenge-types.enum';
 
 @Injectable()
 export class ChallengesRepository implements IREST<Challenge, CreateChallengeDto> {
@@ -65,7 +66,7 @@ export class ChallengesRepository implements IREST<Challenge, CreateChallengeDto
   async createGlobal(createChallengeDto: CreateChallengeDto): Promise<Challenge | void> {
     const newChallenge = await this.challengeRepository.create(createChallengeDto);
 
-    newChallenge.challenge_type = 'global';
+    newChallenge.challenge_type = ChallengeType.GLOBAL;
     return await this.challengeRepository.save(newChallenge);
   }
 
@@ -87,10 +88,6 @@ export class ChallengesRepository implements IREST<Challenge, CreateChallengeDto
   }
 
   async create(createChallengeDto: CreateChallengeDto): Promise<Challenge | void> {
-    if (!createChallengeDto.createdByEmail) {
-      throw new BadRequestException('createdByEmail is required');
-    }
-
     const memberEmail = createChallengeDto.createdByEmail;
     if (!memberEmail) {
       throw new BadRequestException('createdByEmail is required');

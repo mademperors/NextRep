@@ -1,5 +1,6 @@
 import { Type } from 'class-transformer';
 import { IsEmail, IsIn, IsInt, IsNotEmpty, IsOptional, IsString, Min } from 'class-validator';
+import { ChallengeType } from 'src/constants/enums/challenge-types.enum';
 
 export class CreateChallengeDto {
   @IsNotEmpty({ message: 'Duration is required.' })
@@ -14,8 +15,8 @@ export class CreateChallengeDto {
 
   @IsNotEmpty({ message: 'Challenge type is required.' })
   @IsString({ message: 'Challenge type must be a string.' })
-  @IsIn(['private', 'group', 'global'])
-  challenge_type: string;
+  @IsIn([ChallengeType.GLOBAL, ChallengeType.GROUP, ChallengeType.PRIVATE])
+  challenge_type: ChallengeType;
 
   @IsOptional()
   @IsEmail()
