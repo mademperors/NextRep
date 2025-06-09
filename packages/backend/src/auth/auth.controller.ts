@@ -10,6 +10,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { Response } from 'express';
+import { UserPayload } from 'src/common/constants/types/user-payload.interface';
 import { AuthService } from './auth.service';
 import { Public } from './decorators/public.decorator';
 import { AuthDto } from './dtos/auth.dto';
@@ -45,7 +46,7 @@ export class AuthController {
 
   //for front jwt parsing
   @Get('me')
-  status(@Req() req) {
+  status(@Req() req): UserPayload {
     return req.user;
   }
 }

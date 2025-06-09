@@ -1,12 +1,15 @@
-import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsInt, IsNumber, IsOptional, IsString } from 'class-validator';
 import { Gender } from 'src/common/constants/enums/gender.enum';
 
 export class UpdateMemberDto {
-  @IsNumber()
+  @IsNumber(
+    { allowInfinity: false, allowNaN: false, maxDecimalPlaces: 1 },
+    { message: 'Weight must be a number with 1 decimal place(e.g. 66.6)' },
+  )
   @IsOptional()
   weight?: number; //kg
 
-  @IsNumber()
+  @IsInt()
   @IsOptional()
   height?: number; //cm
 
@@ -25,10 +28,6 @@ export class UpdateMemberDto {
   @IsString()
   @IsOptional()
   additional_info?: string;
-
-  // @IsEmail()
-  @IsOptional()
-  email?: string;
 
   @IsString()
   @IsOptional()

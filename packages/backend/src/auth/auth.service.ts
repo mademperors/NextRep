@@ -24,7 +24,7 @@ export class AuthService {
     if (!comparePasswords(loginDto.password, foundUser.password)) return null;
 
     const payload = { role: loginDto.role };
-    return this.jwtService.sign(payload, { subject: String(foundUser.email) });
+    return this.jwtService.sign(payload, { subject: foundUser.email });
   }
 
   async validateJwt(payload: JwtPayload): Promise<unknown | null> {

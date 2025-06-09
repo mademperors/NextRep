@@ -4,7 +4,7 @@ import { plainToInstance } from 'class-transformer';
 import { encodePassword } from 'src/common/utils/bcrypt';
 import { AuthInfo } from 'src/database/entities/auth-info.interface';
 import { Member } from 'src/database/entities/member.entity';
-import { DeepPartial, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { IAUTH } from '../interfaces/iauth.interface';
 import { ICRUD } from '../interfaces/icrud.interface';
 import { CreateMemberDto } from './dtos/create-member.dto';
@@ -36,7 +36,7 @@ export class MembersRepository
 
   async create(dto: CreateMemberDto): Promise<void> {
     try {
-      dto.password = await encodePassword(dto.password);
+      dto.password = encodePassword(dto.password);
       const newMember: Member = this.memberRepository.create(dto);
       await this.memberRepository.insert(newMember);
     } catch (err) {
@@ -48,22 +48,16 @@ export class MembersRepository
   async update(email: string, dto: UpdateMemberDto): Promise<ResponseMemberDto> {
     const memberToUpdate = await this.memberRepository.findOneBy({ email });
     if (!memberToUpdate) throw new BadRequestException(`Member not found`);
-    console.log('HELP');
-    if (dto.email && dto.email !== email) {
-      const emailExists = await this.memberRepository.existsBy({ email: dto.email });
-      if (emailExists) throw new ConflictException(`Email ${dto.email} is already taken`);
+
+    for (const key in dto) {
+      const value = dto[key as keyof UpdateMemberDto];
+      if (value === undefined || (typeof value === 'string' && value.trim() === '')) {
+        delete dto[key as keyof UpdateMemberDto];
+      }
     }
+    if (dto.password) dto.password = encodePassword(dto.password);
 
-    if (dto.password) dto.password = await encodePassword(dto.password);
-    const updateData = { ...dto };
-    Object.keys(updateData).forEach(
-      (key) =>
-        updateData[key as keyof UpdateMemberDto] === undefined &&
-        delete updateData[key as keyof UpdateMemberDto],
-    );
-
-    const partialUpdate = updateData as DeepPartial<Member>;
-    const updatedMember = this.memberRepository.merge(memberToUpdate, partialUpdate);
+    const updatedMember = Object.assign(memberToUpdate, dto);
     const saved = await this.memberRepository.save(updatedMember);
     return plainToInstance(ResponseMemberDto, saved);
   }
