@@ -7,7 +7,6 @@ import {
   ParseIntPipe,
   Patch,
   Post,
-  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -17,6 +16,7 @@ import { Role } from 'src/constants/enums/roles.enum';
 import { ChallengesRepository } from './challenges.repository';
 import { CreateChallengeDto } from './dto/create-challenge.dto';
 import { UpdateChallengeDto } from './dto/update-challenge.dto';
+import { AddMemberDto } from './dto/new-member-in-challenge.dto';
 
 @Controller('challenges')
 export class ChallengesController {
@@ -58,11 +58,8 @@ export class ChallengesController {
   }
 
   @Patch(':id/newMember')
-  async addNewMember(
-    @Param('id', ParseIntPipe) id: number,
-    @Query('memberEmail') memberEmail: string,
-  ) {
-    return await this.challengesRepository.addNewMember(id, memberEmail);
+  async addNewMember(@Param('id', ParseIntPipe) id: number, @Body() addMemberDto: AddMemberDto) {
+    return await this.challengesRepository.addNewMember(id, addMemberDto.memberEmail);
   }
 
   @Delete(':id')

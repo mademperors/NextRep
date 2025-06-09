@@ -29,9 +29,6 @@ export class ChallengesRepository implements IREST<Challenge, CreateChallengeDto
   ) {}
 
   async addNewMember(challenge_id: number, memberEmail: string): Promise<MemberChallenge> {
-    if (!memberEmail) {
-      throw new BadRequestException('memberEmail is required');
-    }
     const member = await this.membersRepository.findOne({ email: memberEmail });
     if (!member) {
       throw new BadRequestException(`Member with email ${memberEmail} does not exist`);
