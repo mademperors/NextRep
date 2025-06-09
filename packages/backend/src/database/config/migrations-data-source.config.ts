@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import { DataSourceOptions } from 'typeorm';
-import { Member } from '../entities/member.entity';
-import { Training } from '../entities/training.entity';
+import { Challenge } from '../entities/challenge.entity';
+import { MemberChallenge } from '../entities/memberChallenge.entity';
 import { BasePostgresConfig } from './base-postgres.config';
 
 export class MigrationsDataSourceConfig extends BasePostgresConfig {
@@ -11,7 +11,7 @@ export class MigrationsDataSourceConfig extends BasePostgresConfig {
 
   constructor() {
     super();
-    this.entities = [Training, Member];
+    this.entities = [Challenge, MemberChallenge];
     this.migrations = ['src/database/migrations/*.ts'];
     this.migrationsRun = false;
   }
