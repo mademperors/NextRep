@@ -4,7 +4,7 @@ import { plainToInstance } from 'class-transformer';
 import { encodePassword } from 'src/common/utils/bcrypt';
 import { Admin } from 'src/database/entities/admin.entity';
 import { AuthInfo } from 'src/database/entities/auth-info.interface';
-import { Repository } from 'typeorm';
+import { FindOptionsWhere, Repository } from 'typeorm';
 import { IAUTH } from '../interfaces/iauth.interface';
 import { ICRUD } from '../interfaces/icrud.interface';
 import { CreateAdminDto } from './dtos/create-admin.dto';
@@ -22,14 +22,14 @@ export class AdminsRepository
 {
   constructor(@InjectRepository(Admin) private readonly adminsRepository: Repository<Admin>) {}
 
-  async findOne(options: Record<string, string | number>): Promise<ResponseAdminDto> {
+  async findOne(options: FindOptionsWhere<Admin>): Promise<ResponseAdminDto> {
     const admin = await this.adminsRepository.findOneBy(options);
     if (!admin) throw new BadRequestException(`Admin not found`);
 
     return plainToInstance(ResponseAdminDto, admin);
   }
 
-  async find(options: Partial<Admin>): Promise<ResponseAdminDto[]> {
+  async find(options: FindOptionsWhere<Admin>): Promise<ResponseAdminDto[]> {
     const admins = await this.adminsRepository.findBy(options);
     return plainToInstance(ResponseAdminDto, admins);
   }

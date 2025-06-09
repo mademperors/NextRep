@@ -4,7 +4,7 @@ import { plainToInstance } from 'class-transformer';
 import { encodePassword } from 'src/common/utils/bcrypt';
 import { AuthInfo } from 'src/database/entities/auth-info.interface';
 import { Member } from 'src/database/entities/member.entity';
-import { Repository } from 'typeorm';
+import { FindOptionsWhere, Repository } from 'typeorm';
 import { IAUTH } from '../interfaces/iauth.interface';
 import { ICRUD } from '../interfaces/icrud.interface';
 import { CreateMemberDto } from './dtos/create-member.dto';
@@ -22,14 +22,14 @@ export class MembersRepository
 {
   constructor(@InjectRepository(Member) private readonly memberRepository: Repository<Member>) {}
 
-  async findOne(options: Record<string, string | number>): Promise<ResponseMemberDto> {
+  async findOne(options: FindOptionsWhere<Member>): Promise<ResponseMemberDto> {
     const member = await this.memberRepository.findOneBy(options);
     if (!member) throw new BadRequestException(`Member not found`);
 
     return plainToInstance(ResponseMemberDto, member);
   }
 
-  async find(options: Partial<Member>): Promise<ResponseMemberDto[]> {
+  async find(options: FindOptionsWhere<Member>): Promise<ResponseMemberDto[]> {
     const members = await this.memberRepository.findBy(options);
     return plainToInstance(ResponseMemberDto, members);
   }
