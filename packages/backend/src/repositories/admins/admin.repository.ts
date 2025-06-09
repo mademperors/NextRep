@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { plainToInstance } from 'class-transformer';
 import { encodePassword } from 'src/common/utils/bcrypt';
@@ -40,33 +40,28 @@ export class AdminsRepository implements ICRUD<Admin, Dtos, Param>, IAUTH {
       const newAdmin: Admin = this.adminsRepository.create(dto);
       await this.adminsRepository.insert(newAdmin);
     } catch (err) {
-      if (err.code === '23505') throw new ConflictException();
+      if (err.code === '23505') throw new UnauthorizedException();
       else throw err;
     }
   }
 
   async update(email: string, dto: UpdateAdminDto): Promise<ResponseAdminDto> {
-    const adminToUpdate = await this.adminsRepository.findOneBy({ email });
-    if (!adminToUpdate) throw new BadRequestException(`Member not found`);
+    const existing = await this.adminsRepository.findOneBy({ email });
+    if (!existing) throw new BadRequestException(`Admin not found`);
 
-    for (const key in dto) {
-      const value = dto[key as keyof UpdateAdminDto];
-      if (value === undefined || (typeof value === 'string' && value.trim() === '')) {
-        delete dto[key as keyof UpdateAdminDto];
-      }
-    }
     if (dto.password) dto.password = encodePassword(dto.password);
 
-    const updatedMember = Object.assign(adminToUpdate, dto);
-    const saved = await this.adminsRepository.save(updatedMember);
+    const updated = this.adminsRepository.merge(existing, dto);
+    const saved = await this.adminsRepository.save(updated);
     return plainToInstance(ResponseAdminDto, saved);
   }
 
-  async delete(email: string): Promise<void> {
-    await this.adminsRepository.delete({ email });
+  async delete(email: Param): Promise<void> {
+    const deleted = await this.adminsRepository.delete({ email });
+    if (deleted.affected === 0) throw new BadRequestException(`Admin not found`);
   }
 
-  async getCredentials(email: string): Promise<AuthInfo | null> {
+  async getCredentials(email: Param): Promise<AuthInfo | null> {
     return await this.adminsRepository.findOne({
       where: { email },
       select: ['email', 'password'],

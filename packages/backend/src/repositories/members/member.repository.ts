@@ -46,30 +46,32 @@ export class MembersRepository implements ICRUD<Member, Dtos, Param>, IAUTH {
   }
 
   async update(email: string, dto: UpdateMemberDto): Promise<ResponseMemberDto> {
-    const memberToUpdate = await this.memberRepository.findOneBy({ email });
-    if (!memberToUpdate) throw new BadRequestException(`Member not found`);
+    const existing = await this.memberRepository.findOneBy({ email });
+    if (!existing) throw new BadRequestException(`Member not found`);
 
-    for (const key in dto) {
-      const value = dto[key as keyof UpdateMemberDto];
-      if (value === undefined || (typeof value === 'string' && value.trim() === '')) {
-        delete dto[key as keyof UpdateMemberDto];
-      }
-    }
     if (dto.password) dto.password = encodePassword(dto.password);
 
-    const updatedMember = Object.assign(memberToUpdate, dto);
-    const saved = await this.memberRepository.save(updatedMember);
+    const updated = this.memberRepository.merge(existing, dto);
+    const saved = await this.memberRepository.save(updated);
     return plainToInstance(ResponseMemberDto, saved);
   }
 
-  async delete(email: string): Promise<void> {
-    await this.memberRepository.delete({ email });
+  async delete(email: Param): Promise<void> {
+    const deleted = await this.memberRepository.delete({ email });
+    if (deleted.affected === 0) throw new BadRequestException(`Member not found`);
   }
 
-  async getCredentials(email: string): Promise<AuthInfo | null> {
+  async getCredentials(email: Param): Promise<AuthInfo | null> {
     return await this.memberRepository.findOne({
       where: { email },
       select: ['email', 'password'],
     });
+  }
+
+  async findOneFull(options: FindOptionsWhere<Member>): Promise<Member> {
+    const member = await this.memberRepository.findOneBy(options);
+    if (!member) throw new BadRequestException(`Member not found`);
+
+    return member;
   }
 }

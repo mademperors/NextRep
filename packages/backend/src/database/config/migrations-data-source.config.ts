@@ -1,5 +1,7 @@
+import 'dotenv/config';
 import { DataSourceOptions } from 'typeorm';
 import { Member } from '../entities/member.entity';
+import { Training } from '../entities/training.entity';
 import { BasePostgresConfig } from './base-postgres.config';
 
 export class MigrationsDataSourceConfig extends BasePostgresConfig {
@@ -7,9 +9,9 @@ export class MigrationsDataSourceConfig extends BasePostgresConfig {
   readonly migrations: DataSourceOptions['migrations'];
   readonly migrationsRun: boolean;
 
-  constructor(env: NodeJS.ProcessEnv = process.env) {
-    super(env);
-    this.entities = [Member];
+  constructor() {
+    super();
+    this.entities = [Training, Member];
     this.migrations = ['src/database/migrations/*.ts'];
     this.migrationsRun = false;
   }

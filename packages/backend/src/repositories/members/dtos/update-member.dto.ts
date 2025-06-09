@@ -1,5 +1,6 @@
 import { IsEnum, IsInt, IsNumber, IsOptional, IsString } from 'class-validator';
 import { Gender } from 'src/common/constants/enums/gender.enum';
+import { Goal } from 'src/common/constants/enums/goal.enum';
 
 export class UpdateMemberDto {
   @IsNumber(
@@ -15,15 +16,15 @@ export class UpdateMemberDto {
 
   @IsEnum(Gender)
   @IsOptional()
-  gender?: number;
+  gender?: Gender;
 
   @IsNumber()
   @IsOptional()
   age?: number;
 
-  @IsString()
+  @IsEnum(Goal)
   @IsOptional()
-  goal?: string;
+  goal?: Goal;
 
   @IsString()
   @IsOptional()

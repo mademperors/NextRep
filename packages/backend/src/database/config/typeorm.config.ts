@@ -1,12 +1,13 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
+import 'dotenv/config';
 import { BasePostgresConfig } from './base-postgres.config';
 
 export class TypeOrmConfig extends BasePostgresConfig {
   readonly autoLoadEntities: boolean;
   readonly retryAttempts: number;
 
-  constructor(env: NodeJS.ProcessEnv = process.env) {
-    super(env);
+  constructor() {
+    super();
     this.autoLoadEntities = true;
     this.retryAttempts = 3;
   }
