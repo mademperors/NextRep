@@ -8,8 +8,13 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.setGlobalPrefix('NextRep/api');
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+    }),
+  );
   app.useGlobalFilters(new HttpExceptionFilter());
+  app.use(cookieParser());
 
   app.enableCors({
     origin: process.env.CLIENT_URL || 'http://localhost:5173',
@@ -17,7 +22,6 @@ async function bootstrap() {
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
   });
-  app.use(cookieParser());
 
   const host = process.env.HOST ?? 3001;
   const port = process.env.PORT ?? 'localhost';

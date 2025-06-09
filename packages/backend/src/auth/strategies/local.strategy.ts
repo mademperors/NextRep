@@ -2,7 +2,7 @@ import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/
 import { PassportStrategy } from '@nestjs/passport';
 import { Request } from 'express';
 import { Strategy } from 'passport-local';
-import { Role } from '../../constants/enums/roles.enum';
+import { Role } from '../../common/constants/enums/roles.enum';
 import { AuthService } from '../auth.service';
 import { AuthDto } from '../dtos/auth.dto';
 

@@ -1,4 +1,4 @@
-name: Node.js linter on main pushes
+name: CI pipeline
 
 permissions:
   contents: read
@@ -7,9 +7,12 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
-  lint:
+  checks:
     runs-on: ubuntu-latest
 
     steps:
@@ -25,7 +28,7 @@ jobs:
           cd packages/backend
           yarn install
 
-      - name: Run lint
+      - name: Lint check
         run: |
           cd packages/backend
           yarn lint

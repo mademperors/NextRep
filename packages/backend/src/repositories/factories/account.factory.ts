@@ -1,12 +1,13 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { Role } from 'src/common/constants/enums/roles.enum';
+import { AuthInfo } from 'src/database/entities/auth-info.interface';
 import { AdminsRepository } from '../admins/admin.repository';
-import { IAUTH } from '../interfaces/iauth.interface';
+import { ICRUD } from '../interfaces/icrud.interface';
 import { MembersRepository } from '../members/member.repository';
 
 @Injectable()
-export class AuthFactory {
-  private readonly repoStrategy: Record<Role, IAUTH>;
+export class AccountFactory {
+  private readonly repoStrategy: Record<Role, ICRUD<AuthInfo>>;
 
   constructor(
     private readonly memberRepository: MembersRepository,
@@ -18,7 +19,7 @@ export class AuthFactory {
     };
   }
 
-  getRepository(role: Role): IAUTH {
+  getRepository(role: Role): ICRUD<AuthInfo> {
     const repo = this.repoStrategy[role];
     if (!repo) throw new BadRequestException(`'${role}' role is not defined`);
     return repo;
