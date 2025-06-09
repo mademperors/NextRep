@@ -11,15 +11,15 @@ import { CreateMemberDto } from './dtos/create-member.dto';
 import { ResponseMemberDto } from './dtos/response-member.dto';
 import { UpdateMemberDto } from './dtos/update-member.dto';
 
+type Dtos = {
+  CreateDto: CreateMemberDto;
+  UpdateDto: UpdateMemberDto;
+  ResponseDto: ResponseMemberDto;
+};
+type Param = string;
+
 @Injectable()
-export class MembersRepository
-  implements
-    ICRUD<
-      Member,
-      { CreateDto: CreateMemberDto; UpdateDto: UpdateMemberDto; ResponseDto: ResponseMemberDto }
-    >,
-    IAUTH
-{
+export class MembersRepository implements ICRUD<Member, Dtos, Param>, IAUTH {
   constructor(@InjectRepository(Member) private readonly memberRepository: Repository<Member>) {}
 
   async findOne(options: FindOptionsWhere<Member>): Promise<ResponseMemberDto> {
