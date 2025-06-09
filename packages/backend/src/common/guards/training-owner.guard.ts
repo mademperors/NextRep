@@ -8,12 +8,8 @@ export class TrainingOwnerGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const req: Request = context.switchToHttp().getRequest<Request>();
-    const user = req.user;
+    const user = req.user!;
     const challengeId = +req.params['id'];
-
-    if (!user || !challengeId) {
-      throw new ForbiddenException('Access denied');
-    }
 
     const creator = await this.trainingRepository.findCreator({ id: challengeId });
 
