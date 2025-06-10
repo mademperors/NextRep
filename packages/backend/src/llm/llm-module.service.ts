@@ -2,8 +2,8 @@ import { HumanMessage, SystemMessage } from '@langchain/core/messages';
 import { ChatGoogleGenerativeAI } from '@langchain/google-genai';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { Gender } from 'src/common/constants/enums/gender.enum';
-import { ResponseMemberDto } from '../members/dtos/response-member.dto';
-import { MembersRepository } from '../members/member.repository';
+import { ResponseMemberDto } from '../repositories/members/dtos/response-member.dto';
+import { MembersRepository } from '../repositories/members/member.repository';
 import { ResponseLLMDto } from './dto/responce-llm.dto';
 import { mealRecommendationExamples } from './prompts/meal-recomendation-examples';
 
@@ -12,10 +12,10 @@ export class LlmModuleService {
   constructor(private readonly memberRepository: MembersRepository) {}
 
   private readonly googleGenerativeModel = new ChatGoogleGenerativeAI({
-      model: 'gemini-2.0-flash',
-      temperature: 0,
-      apiKey: process.env.GOOGLE_API_KEY,
-    });
+    model: 'gemini-2.0-flash',
+    temperature: 0,
+    apiKey: process.env.GOOGLE_API_KEY,
+  });
 
   async getRecommendation(email: any): Promise<ResponseLLMDto> {
     const member = await this.memberRepository.findOne({ email: email });
