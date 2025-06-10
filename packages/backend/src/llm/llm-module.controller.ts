@@ -6,7 +6,7 @@ export class LlmModuleController {
   constructor(private readonly llmModuleService: LlmModuleService) {}
 
   @Get('recommendation')
-  getRecommendation(@Body() memberData: JSON, @Req() req) {
-      return this.llmModuleService.getRecommendation(req.user.email);
+  getRecommendation(@Body() memberData: JSON, @Req() req : Request) {
+      return this.llmModuleService.getRecommendation(req.user!.username);
     }
 }

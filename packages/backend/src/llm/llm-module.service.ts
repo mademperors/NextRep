@@ -17,8 +17,8 @@ export class LlmModuleService {
     apiKey: process.env.GOOGLE_API_KEY,
   });
 
-  async getRecommendation(email: string): Promise<ResponseLLMDto> {
-    const member = await this.memberRepository.findOne({ email: email });
+  async getRecommendation(username: string): Promise<ResponseLLMDto> {
+    const member = await this.memberRepository.findOne({ where: { username } });
 
     const memberChallenges = []; // TODO: call member_challenge repo method to get challenges of member
 
