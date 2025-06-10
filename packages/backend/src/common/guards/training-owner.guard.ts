@@ -1,20 +1,22 @@
 import { CanActivate, ExecutionContext, ForbiddenException, Injectable } from '@nestjs/common';
 import { Request } from 'express';
-import { TrainingsRepository } from 'src/repositories/trainings/training.repository';
+import { TrainingsService } from 'src/repositories/trainings/services/training.service';
 
 @Injectable()
 export class TrainingOwnerGuard implements CanActivate {
-  constructor(private readonly trainingRepository: TrainingsRepository) {}
+  constructor(private readonly trainingRepository: TrainingsService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const req: Request = context.switchToHttp().getRequest<Request>();
     const user = req.user!;
-    const challengeId = +req.params['id'];
+    const id = +req.params['id'];
 
-    const creator = await this.trainingRepository.findCreator({ id: challengeId });
+    const creatorUsername = await this.trainingRepository.getTrainingCreatorUsername(id);
 
-    if (creator.email !== user.email) {
-      throw new ForbiddenException('You can only access your own challenges');
+    if (creatorUsername !== user.username) {
+      throw new ForbiddenException(
+        'You are not authorized to perform this action on this training',
+      );
     }
 
     return true;

@@ -1,4 +1,4 @@
-import { FindOptionsWhere } from 'typeorm';
+import { FindManyOptions, FindOneOptions } from 'typeorm';
 
 export interface ICRUD<
   Entity,
@@ -9,9 +9,9 @@ export interface ICRUD<
   } = Record<string, unknown>,
   Param = string | number,
 > {
-  findOne(options: FindOptionsWhere<Entity>): Promise<Dtos['ResponseDto']>;
-  find(options: FindOptionsWhere<Entity>): Promise<Dtos['ResponseDto'][]>;
-  create(dto: Dtos['CreateDto']): Promise<Dtos['ResponseDto'] | void>;
-  update(param: Param, dto: Dtos['UpdateDto']): Promise<Dtos['ResponseDto']>;
+  findOne(options: FindOneOptions<Entity>): Promise<Dtos['ResponseDto']>;
+  find(options: FindManyOptions<Entity>): Promise<Dtos['ResponseDto'][]>;
+  create(dto: Dtos['CreateDto']): Promise<void>;
+  update(param: Param, dto: Dtos['UpdateDto']): Promise<void>;
   delete(param: Param): Promise<void>;
 }

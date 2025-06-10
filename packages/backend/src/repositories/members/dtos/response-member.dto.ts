@@ -1,7 +1,7 @@
 import { Exclude } from 'class-transformer';
 
 export class ResponseMemberDto {
-  email: string;
+  username: string;
   weight: number;
   height: number;
   gender: string;

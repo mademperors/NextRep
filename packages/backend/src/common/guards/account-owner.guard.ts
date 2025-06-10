@@ -6,9 +6,9 @@ export class AccountOwnerGuard implements CanActivate {
     const req: Request = context.switchToHttp().getRequest<Request>();
     const user = req.user!;
 
-    const paramValue = req.params['email'];
+    const paramValue = req.params['username'];
 
-    if (user.email !== paramValue) {
+    if (user.username !== paramValue) {
       throw new ForbiddenException('You can only access your own data');
     }
 
