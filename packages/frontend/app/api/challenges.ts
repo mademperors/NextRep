@@ -56,6 +56,8 @@ const mockChallenges: Challenge[] = [
 ];
 
 export const getChallenges = async () => {
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+  return Promise.resolve(mockChallenges);
   // const response = await apiFetch('/challenges', {
   //   method: 'GET',
   // });

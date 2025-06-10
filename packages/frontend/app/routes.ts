@@ -10,7 +10,7 @@ export default [
   ...prefix('profile', [index('routes/profile.tsx'), route('edit', 'routes/edit-profile.tsx')]),
 
   ...prefix('challenges', [
-    // index('routes/challenges.tsx'),
+    index('routes/challenge-list.tsx'),
     route(':challengeId', 'routes/single-challenge.tsx'),
   ]),
 ] satisfies RouteConfig;
