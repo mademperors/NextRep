@@ -1,6 +1,7 @@
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, JoinTable, ManyToMany } from 'typeorm';
 import { Gender } from '../../common/constants/enums/gender.enum';
 import { Goal } from '../../common/constants/enums/goal.enum';
+import { Achivement } from './achivement.entity';
 import { AuthInfo } from './auth-info.interface';
 
 @Entity('member')
@@ -22,4 +23,8 @@ export class Member extends AuthInfo {
 
   @Column('text', { nullable: true })
   additional_info?: string;
+
+  @ManyToMany(() => Achivement, { nullable: true, onDelete: 'NO ACTION' })
+  @JoinTable()
+  achivements?: Achivement[];
 }
