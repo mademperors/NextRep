@@ -9,10 +9,10 @@ export class Training {
   @Column('varchar', { length: 100, nullable: false })
   title: string;
 
-  @ManyToOne(() => Member, { nullable: false, onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'creator', referencedColumnName: 'email' })
-  creator: Member;
-
   @Column('text', { nullable: false })
   training_info: string;
+
+  @ManyToOne(() => Member, { nullable: false, onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'creator', referencedColumnName: 'username' })
+  creator: Member;
 }

@@ -38,7 +38,6 @@ export class AuthController {
   }
 
   @Public()
-  @HttpCode(HttpStatus.OK)
   @Post('signUp')
   async signUp(@Body() createAccountDto: AuthDto): Promise<void> {
     await this.authService.signUp(createAccountDto);
