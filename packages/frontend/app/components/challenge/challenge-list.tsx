@@ -1,4 +1,5 @@
 import { Clock } from 'lucide-react';
+import { useNavigate } from 'react-router';
 import { Badge } from '~/components/ui/badge';
 import { Card } from '~/components/ui/card';
 
@@ -19,13 +20,17 @@ interface ChallengeListProps {
 }
 
 function ChallengeItem({ challenge }: ChallengeItemProps) {
+  const navigate = useNavigate();
   const truncateText = (text: string, maxLength = 100) => {
     if (text.length <= maxLength) return text;
     return text.substring(0, maxLength) + '...';
   };
 
   return (
-    <Card className="flex flex-row items-center p-6">
+    <Card
+      className="flex flex-row items-center p-6 cursor-pointer"
+      onClick={() => navigate(`/challenges/${challenge.id}`)}
+    >
       <div className="flex-grow">
         <div className="flex justify-between items-start mb-2">
           <h3 className="text-xl font-semibold">{challenge.name}</h3>
