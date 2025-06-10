@@ -4,14 +4,14 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { Gender } from 'src/common/constants/enums/gender.enum';
 import { ResponseMemberDto } from '../members/dtos/response-member.dto';
 import { MembersRepository } from '../members/member.repository';
-import { mealRecommendationExamples } from './prompts/meal-recomendation-examples';
 import { ResponseLLMDto } from './dto/responce-llm.dto';
+import { mealRecommendationExamples } from './prompts/meal-recomendation-examples';
 
 @Injectable()
 export class LlmModuleService {
   constructor(private readonly memberRepository: MembersRepository) {}
 
-  async getResponce(email: any) : Promise<ResponseLLMDto>{
+  async getRecommendation(email: any): Promise<ResponseLLMDto> {
     const model = new ChatGoogleGenerativeAI({
       model: 'gemini-2.0-flash',
       temperature: 0,
@@ -64,8 +64,7 @@ export class LlmModuleService {
     }
     if (member.goal === 'gain_muscle') {
       return bmr * 1.25;
-    }
-    else {
+    } else {
       throw new BadRequestException('Unknown goal for BMR calculation.');
     }
   }
