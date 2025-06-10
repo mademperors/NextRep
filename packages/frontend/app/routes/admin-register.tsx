@@ -1,4 +1,4 @@
-import { RegisterForm } from '~/components/register-form';
+import { RegisterForm } from '~/components/auth/register-form';
 import { Role } from '~/constants/enums/roles.enum';
 import type { Route } from './+types/register';
 
@@ -16,3 +16,4 @@ export default function Register() {
     </div>
   );
 }
+

@@ -3,10 +3,11 @@ import 'react-chrome-dino-ts/index.css';
 import { useNavigate } from 'react-router';
 import { getProfile } from '~/api/members';
 import Profile from '~/components/profile/profile';
+import { InlineDnaLoader } from '~/components/ui/dna-loader';
 import type { Route } from './+types/profile';
 
 export function meta({}: Route.MetaArgs) {
-  return [{ title: 'Profile' }, { name: 'description', content: 'Profile' }];
+  return [{ title: 'Profile' }, { name: 'description', content: 'View your profile' }];
 }
 
 export default function ProfilePage() {
@@ -43,7 +44,11 @@ export default function ProfilePage() {
   };
 
   if (isLoading) {
-    return <div>Loading...</div>; // TODO: loading
+    return (
+      <div className="flex h-screen w-full items-center justify-center">
+        <InlineDnaLoader height={60} width={60} ariaLabel="Loading profile..." />
+      </div>
+    );
   }
 
   if (status === 'error') {

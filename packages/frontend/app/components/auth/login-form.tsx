@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { login } from '~/api/auth';
 import { Button } from '~/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card';
+import { InlineDnaLoader } from '~/components/ui/dna-loader';
 import { Input } from '~/components/ui/input';
 import { Label } from '~/components/ui/label';
 import type { Role } from '~/constants/enums/roles.enum';
@@ -48,7 +49,9 @@ export function LoginForm({
       <Card>
         <CardHeader>
           <CardTitle className="text-2xl">Login</CardTitle>
-          <CardDescription>Enter your email below to login to your account</CardDescription>
+          <CardDescription>
+            Enter your username and password to login to your account
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit}>
@@ -58,17 +61,16 @@ export function LoginForm({
                 <Input
                   id="username"
                   type="text"
-                  placeholder="m@example.com"
+                  placeholder="username"
                   required
                   value={username}
                   autoComplete="username"
                   onChange={(e) => setUsername(e.target.value)}
+                  disabled={mutation.isPending}
                 />
               </div>
               <div className="grid gap-2">
-                <div className="flex items-center">
-                  <Label htmlFor="password">Password</Label>
-                </div>
+                <Label htmlFor="password">Password</Label>
                 <Input
                   id="password"
                   type="password"
@@ -76,10 +78,18 @@ export function LoginForm({
                   value={password}
                   autoComplete="current-password"
                   onChange={(e) => setPassword(e.target.value)}
+                  disabled={mutation.isPending}
                 />
               </div>
-              <Button type="submit" className="w-full">
-                Login
+              <Button type="submit" className="w-full" disabled={mutation.isPending}>
+                {mutation.isPending ? (
+                  <div className="flex items-center gap-2">
+                    <InlineDnaLoader height={20} width={20} ariaLabel="Logging in..." />
+                    <span>Logging in...</span>
+                  </div>
+                ) : (
+                  'Login'
+                )}
               </Button>
               {/* <Button variant="outline" className="w-full">
                 Login with Google

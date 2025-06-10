@@ -1,16 +1,10 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import {
-  isRouteErrorResponse,
-  Links,
-  Meta,
-  Outlet,
-  Scripts,
-  ScrollRestoration,
-} from 'react-router';
+import { Links, Meta, Outlet, Scripts, ScrollRestoration } from 'react-router';
 
 import { Toaster } from 'sonner';
 import type { Route } from './+types/root';
 import './app.css';
+import { AuthProvider } from './components/auth/AuthProvider';
 import { Navigation } from './components/navigation';
 
 // Create a client
@@ -43,48 +37,21 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
-        <Navigation />
-        {children}
-        <ScrollRestoration />
-        <Scripts />
-        <Toaster />
+        <QueryClientProvider client={queryClient}>
+          <AuthProvider>
+            <Navigation />
+            {children}
+            <ScrollRestoration />
+            <Scripts />
+            <Toaster />
+          </AuthProvider>
+        </QueryClientProvider>
       </body>
     </html>
   );
 }
 
 export default function App() {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <Outlet />
-    </QueryClientProvider>
-  );
-}
-
-export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
-  let message = 'Oops!';
-  let details = 'An unexpected error occurred.';
-  let stack: string | undefined;
-
-  if (isRouteErrorResponse(error)) {
-    message = error.status === 404 ? '404' : 'Error';
-    details =
-      error.status === 404 ? 'The requested page could not be found.' : error.statusText || details;
-  } else if (import.meta.env.DEV && error && error instanceof Error) {
-    details = error.message;
-    stack = error.stack;
-  }
-
-  return (
-    <main className="pt-16 p-4 container mx-auto">
-      <h1>{message}</h1>
-      <p>{details}</p>
-      {stack && (
-        <pre className="w-full p-4 overflow-x-auto">
-          <code>{stack}</code>
-        </pre>
-      )}
-    </main>
-  );
+  return <Outlet />;
 }
 

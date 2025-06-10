@@ -1,3 +1,4 @@
+import type { User } from '~/components/auth/AuthProvider';
 import apiFetch from './apiFetch';
 
 enum Role {
@@ -23,17 +24,21 @@ const login = async (username: string, password: string, role: Role) => {
     },
     body: JSON.stringify({ username, password, role }),
   });
-
-  //   return response.json();
 };
-// For testing purposes
-const checkAuth = async () => {
-  const response = await apiFetch('/auth/status', {
+
+const logout = async () => {
+  const response = await apiFetch('/auth/signOut', {
+    method: 'POST',
+  });
+};
+
+const checkAuth = async (): Promise<User> => {
+  const response = await apiFetch('/auth/me', {
     method: 'GET',
   });
 
   return response.json();
 };
 
-export { checkAuth, login, register };
+export { checkAuth, login, logout, register };
 
