@@ -1,4 +1,4 @@
-import { type RouteConfig, index, route } from '@react-router/dev/routes';
+import { type RouteConfig, index, prefix, route } from '@react-router/dev/routes';
 
 export default [
   index('routes/home.tsx'),
@@ -6,4 +6,12 @@ export default [
   route('register', 'routes/register.tsx'),
   route('admin/register', 'routes/admin-register.tsx'),
   route('admin/login', 'routes/admin-login.tsx'),
+
+  ...prefix('profile', [index('routes/profile.tsx'), route('edit', 'routes/edit-profile.tsx')]),
+
+  ...prefix('challenges', [
+    // index('routes/challenges.tsx'),
+    route(':challengeId', 'routes/single-challenge.tsx'),
+  ]),
 ] satisfies RouteConfig;
+
