@@ -1,7 +1,10 @@
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'react-router';
 import { getChallenge } from '~/api/challenges';
+import { useAuth } from '~/components/auth/AuthProvider';
 import { Challenge } from '~/components/challenge/challenge';
+import { FullScreenDnaLoader } from '~/components/ui/dna-loader';
+import { Role } from '~/constants/enums/roles.enum';
 import type { Route } from './+types/single-challenge';
 
 export function meta({ params }: Route.MetaArgs) {
@@ -13,20 +16,32 @@ export function meta({ params }: Route.MetaArgs) {
 
 export default function SingleChallenge() {
   const { challengeId } = useParams();
-  const { data: challenge } = useSuspenseQuery({
+  const { user } = useAuth();
+  const { data: challenge, status } = useQuery({
     queryKey: ['challenge', challengeId],
     queryFn: () => getChallenge(challengeId!),
   });
 
-  return (
-    <Challenge
-      days={challenge.days}
-      currentDay={challenge.currentDay}
-      status={challenge.status}
-      title={challenge.name}
-      description={challenge.description}
-      dayDescription={challenge.tasks[challenge.currentDay]}
-      onCompleteDay={() => {}}
-    />
-  );
+  if (status === 'success') {
+    return (
+      <Challenge
+        days={challenge.days}
+        currentDay={challenge.currentDay}
+        status={challenge.status}
+        title={challenge.name}
+        description={challenge.description}
+        dayDescriptions={challenge.tasks}
+        onCompleteDay={() => {}}
+        isEnrolled={
+          (user?.role === Role.MEMBER &&
+            user?.challenges?.some((challenge) => challenge === challengeId)) ||
+          false
+        }
+        onEnroll={() => {}}
+      />
+    );
+  }
+
+  return <FullScreenDnaLoader />;
 }
+

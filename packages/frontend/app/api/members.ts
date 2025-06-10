@@ -11,6 +11,7 @@ const memberSchema = z.object({
   age: z.number().optional(),
   goal: z.nativeEnum(FitnessGoal).optional(),
   additional_info: z.string().optional(),
+  challenges: z.array(z.string()).optional(),
 });
 export type Member = z.infer<typeof memberSchema>;
 
