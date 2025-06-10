@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Training } from 'src/database/entities/training.entity';
 import { FindManyOptions, FindOneOptions, Repository } from 'typeorm';
@@ -54,6 +54,6 @@ export class TrainingsCrudRepository implements ICRUD<Training, Dtos, Param> {
 
   async delete(id: Param): Promise<void> {
     const deleted = await this.trainingsRepository.delete({ id });
-    if (deleted.affected === 0) throw new BadRequestException(`Training not found`);
+    if (deleted.affected === 0) throw new NotFoundException(`Training not found`);
   }
 }

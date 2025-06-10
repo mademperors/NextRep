@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { plainToInstance } from 'class-transformer';
 import { Member } from 'src/database/entities/member.entity';
 import { Training } from 'src/database/entities/training.entity';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { CreateTrainingDto } from '../dtos/create-training.dto';
 import { ResponseTrainingDto } from '../dtos/response-training.dto';
 import { UpdateTrainingDto } from '../dtos/update-training.dto';
@@ -44,6 +44,17 @@ export class TrainingsService {
   }
 
   // --- AUX METHODS ---
+
+  public async findTrainingsByIds(ids: number[]): Promise<Training[]> {
+    if (!ids || ids.length === 0) {
+      return [];
+    }
+    // Using the direct repository to find by IDs with relations
+    return await this.trainingsRepository.find({
+      where: { id: In(ids) }, // Use TypeORM's 'In' operator for multiple IDs
+      relations: ['creator'], // Load creator as it's needed for challenge creation/update contexts
+    });
+  }
 
   public async getTrainingEntityWithCreator(id: number): Promise<Training> {
     const training = await this.trainingsRepository.findOneOrFail({

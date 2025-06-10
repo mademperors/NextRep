@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { plainToInstance } from 'class-transformer';
 import { encodePassword } from 'src/common/utils/bcrypt';
@@ -49,7 +49,7 @@ export class MembersRepository implements ICRUD<Member, Dtos, Param>, IAUTH {
 
   async delete(username: Param): Promise<void> {
     const deleted = await this.memberRepository.delete({ username });
-    if (deleted.affected === 0) throw new BadRequestException(`Member not found`);
+    if (deleted.affected === 0) throw new NotFoundException(`Member not found`);
   }
 
   async getCredentials(username: Param): Promise<AuthInfo | null> {
@@ -60,9 +60,7 @@ export class MembersRepository implements ICRUD<Member, Dtos, Param>, IAUTH {
   }
 
   async findOneFull(options: FindOptionsWhere<Member>): Promise<Member> {
-    const member = await this.memberRepository.findOneBy(options);
-    if (!member) throw new BadRequestException(`Member not found`);
-
+    const member = await this.memberRepository.findOneByOrFail(options);
     return member;
   }
 

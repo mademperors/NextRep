@@ -31,8 +31,6 @@ export class AuthService {
     const repository = this.accountFactory.getRepository(payload.role);
 
     const foundUser = await repository.findOne({ where: { username: payload.sub } });
-    if (!foundUser) return null;
-
     return foundUser;
   }
 

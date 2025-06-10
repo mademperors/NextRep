@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { plainToInstance } from 'class-transformer';
 import { encodePassword } from 'src/common/utils/bcrypt';
@@ -49,7 +49,7 @@ export class AdminsRepository implements ICRUD<Admin, Dtos, Param>, IAUTH {
 
   async delete(username: Param): Promise<void> {
     const deleted = await this.adminsRepository.delete({ username });
-    if (deleted.affected === 0) throw new BadRequestException(`Admin not found`);
+    if (deleted.affected === 0) throw new NotFoundException(`Admin not found`);
   }
 
   async getCredentials(username: Param): Promise<AuthInfo | null> {

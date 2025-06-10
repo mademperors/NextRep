@@ -1,17 +1,17 @@
 import { CanActivate, ExecutionContext, ForbiddenException, Injectable } from '@nestjs/common';
 import { Request } from 'express';
-import { TrainingsService } from 'src/repositories/trainings/services/training.service';
+import { ChallengesService } from 'src/repositories/challenges/services/challenges.service';
 
 @Injectable()
-export class TrainingOwnerGuard implements CanActivate {
-  constructor(private readonly trainingService: TrainingsService) {}
+export class ChallengeOwnerGuard implements CanActivate {
+  constructor(private readonly challengeService: ChallengesService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const req: Request = context.switchToHttp().getRequest<Request>();
     const user = req.user as { username: string };
     const id = +req.params['id'];
 
-    const creatorUsername = await this.trainingService.getTrainingCreatorUsername(id);
+    const creatorUsername = await this.challengeService.getChallengeCreatorUsername(id);
 
     if (creatorUsername !== user.username) {
       throw new ForbiddenException(

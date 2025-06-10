@@ -27,7 +27,6 @@ export class TrainingsController {
     return await this.trainingsService.findTrainings(memberUsername);
   }
 
-  @UseGuards(TrainingOwnerGuard)
   @Get('/:id')
   async getTraining(@Param('id', ParseIntPipe) id: number): Promise<ResponseTrainingDto> {
     return await this.trainingsService.findOneTraining(id);

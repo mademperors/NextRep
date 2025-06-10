@@ -1,16 +1,23 @@
-import { ArrayMinSize, IsArray, IsEnum, IsNumber, IsString } from 'class-validator';
+import {
+  ArrayMinSize,
+  IsArray,
+  IsEnum,
+  IsNumber,
+  IsOptional,
+  IsString,
+  ValidateIf,
+} from 'class-validator';
 import { ChallengeType } from 'src/common/constants/enums/challenge-types.enum';
 
 export class CreateChallengeDto {
   @IsString()
-  challenge_info: string;
+  challengeInfo: string;
 
+  @IsOptional()
   @IsEnum(ChallengeType)
-  challenge_type: ChallengeType;
+  challengeType?: ChallengeType;
 
-  @IsNumber()
-  duration: number;
-
+  @ValidateIf(() => false)
   @IsString()
   creator: string;
 

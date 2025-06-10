@@ -48,20 +48,6 @@ export class Challenge {
   })
   trainings: Training[];
 
-  @ManyToMany(() => Member, { cascade: false })
-  @JoinTable({
-    name: 'enrolled',
-    joinColumn: {
-      name: 'challenge_id',
-      referencedColumnName: 'id',
-    },
-    inverseJoinColumn: {
-      name: 'member_username',
-      referencedColumnName: 'username',
-    },
-  })
-  enrolled: Member[];
-
   @OneToMany(() => MemberChallenge, (enrolled) => enrolled.challenge, {
     cascade: true,
     onDelete: 'CASCADE',
