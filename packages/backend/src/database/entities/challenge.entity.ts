@@ -30,13 +30,13 @@ export class Challenge {
   @Column({ type: 'integer', nullable: false, default: 1 })
   current_day: number;
 
-  @ManyToOne(() => Member, { nullable: false, onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'creator', referencedColumnName: 'email' })
+  @ManyToOne(() => Member, { nullable: false, onDelete: 'RESTRICT' })
+  @JoinColumn({ name: 'creator', referencedColumnName: 'username' })
   creator: Member;
 
-  @ManyToMany(() => Training, { cascade: true })
+  @ManyToMany(() => Training, { cascade: false })
   @JoinTable({
-    name: 'trainings',
+    name: 'challenge_trainings',
     joinColumn: {
       name: 'challenge_id',
       referencedColumnName: 'id',
@@ -56,12 +56,15 @@ export class Challenge {
       referencedColumnName: 'id',
     },
     inverseJoinColumn: {
-      name: 'member_email',
-      referencedColumnName: 'email',
+      name: 'member_username',
+      referencedColumnName: 'username',
     },
   })
   enrolled: Member[];
 
-  @OneToMany(() => MemberChallenge, (enrolled) => enrolled.challenge, { cascade: true })
+  @OneToMany(() => MemberChallenge, (enrolled) => enrolled.challenge, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
   enrolledMembers: MemberChallenge[];
 }

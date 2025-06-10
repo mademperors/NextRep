@@ -19,18 +19,18 @@ export class AuthService {
   async validateLocal(loginDto: AuthDto): Promise<string | null> {
     const repository = this.authFactory.getRepository(loginDto.role);
 
-    const foundUser = await repository.getCredentials(loginDto.email);
+    const foundUser = await repository.getCredentials(loginDto.username);
     if (!foundUser) return null;
     if (!comparePasswords(loginDto.password, foundUser.password)) return null;
 
     const payload = { role: loginDto.role };
-    return this.jwtService.sign(payload, { subject: foundUser.email });
+    return this.jwtService.sign(payload, { subject: foundUser.username });
   }
 
   async validateJwt(payload: JwtPayload): Promise<unknown | null> {
     const repository = this.accountFactory.getRepository(payload.role);
 
-    const foundUser = await repository.findOne({ email: payload.sub });
+    const foundUser = await repository.findOne({ where: { username: payload.sub } });
     if (!foundUser) return null;
 
     return foundUser;

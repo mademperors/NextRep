@@ -1,10 +1,10 @@
-import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { plainToInstance } from 'class-transformer';
 import { encodePassword } from 'src/common/utils/bcrypt';
 import { Admin } from 'src/database/entities/admin.entity';
 import { AuthInfo } from 'src/database/entities/auth-info.interface';
-import { FindOptionsWhere, Repository } from 'typeorm';
+import { FindManyOptions, FindOneOptions, Repository } from 'typeorm';
 import { IAUTH } from '../interfaces/iauth.interface';
 import { ICRUD } from '../interfaces/icrud.interface';
 import { CreateAdminDto } from './dtos/create-admin.dto';
@@ -22,49 +22,40 @@ type Param = string;
 export class AdminsRepository implements ICRUD<Admin, Dtos, Param>, IAUTH {
   constructor(@InjectRepository(Admin) private readonly adminsRepository: Repository<Admin>) {}
 
-  async findOne(options: FindOptionsWhere<Admin>): Promise<ResponseAdminDto> {
-    const admin = await this.adminsRepository.findOneByOrFail(options);
-    if (!admin) throw new BadRequestException(`Admin not found`);
-
+  async findOne(options: FindOneOptions<Admin>): Promise<ResponseAdminDto> {
+    const admin = await this.adminsRepository.findOneOrFail(options);
     return plainToInstance(ResponseAdminDto, admin);
   }
 
-  async find(options: FindOptionsWhere<Admin>): Promise<ResponseAdminDto[]> {
-    const admins = await this.adminsRepository.findBy(options);
+  async find(options: FindManyOptions<Admin>): Promise<ResponseAdminDto[]> {
+    const admins = await this.adminsRepository.find(options);
     return plainToInstance(ResponseAdminDto, admins);
   }
 
   async create(dto: CreateAdminDto): Promise<void> {
-    try {
-      dto.password = encodePassword(dto.password);
-      const newAdmin: Admin = this.adminsRepository.create(dto);
-      await this.adminsRepository.insert(newAdmin);
-    } catch (err) {
-      if (err.code === '23505') throw new UnauthorizedException();
-      else throw err;
-    }
+    dto.password = encodePassword(dto.password);
+    const newAdmin: Admin = this.adminsRepository.create(dto);
+    await this.adminsRepository.insert(newAdmin);
   }
 
-  async update(email: string, dto: UpdateAdminDto): Promise<ResponseAdminDto> {
-    const existing = await this.adminsRepository.findOneBy({ email });
-    if (!existing) throw new BadRequestException(`Admin not found`);
+  async update(username: string, dto: UpdateAdminDto): Promise<void> {
+    const existing = await this.adminsRepository.findOneByOrFail({ username });
 
     if (dto.password) dto.password = encodePassword(dto.password);
 
     const updated = this.adminsRepository.merge(existing, dto);
-    const saved = await this.adminsRepository.save(updated);
-    return plainToInstance(ResponseAdminDto, saved);
+    await this.adminsRepository.save(updated);
   }
 
-  async delete(email: Param): Promise<void> {
-    const deleted = await this.adminsRepository.delete({ email });
+  async delete(username: Param): Promise<void> {
+    const deleted = await this.adminsRepository.delete({ username });
     if (deleted.affected === 0) throw new BadRequestException(`Admin not found`);
   }
 
-  async getCredentials(email: Param): Promise<AuthInfo | null> {
+  async getCredentials(username: Param): Promise<AuthInfo | null> {
     return await this.adminsRepository.findOne({
-      where: { email },
-      select: ['email', 'password'],
+      where: { username },
+      select: ['username', 'password'],
     });
   }
 }

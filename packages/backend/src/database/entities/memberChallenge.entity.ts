@@ -5,10 +5,10 @@ import { Member } from './member.entity';
 @Entity('member_challenge')
 export class MemberChallenge {
   @PrimaryColumn()
-  member_email: string;
+  member_username: string;
 
   @ManyToOne(() => Member, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'member_email', referencedColumnName: 'email' })
+  @JoinColumn({ name: 'member_username', referencedColumnName: 'username' })
   member: Member;
 
   @PrimaryColumn()
