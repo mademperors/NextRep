@@ -5,9 +5,10 @@ import { AccountFactory } from './factories/account.factory';
 import { AuthFactory } from './factories/auth.factory';
 import { MembersModule } from './members/member.module';
 import { TrainingsModule } from './trainings/training.module';
+import { AchivementsModule } from './achievements/achievements.module';
 
 @Module({
-  imports: [MembersModule, AdminsModule, ChallengesModule, TrainingsModule],
+  imports: [MembersModule, AdminsModule, ChallengesModule, TrainingsModule, AchivementsModule],
   providers: [AuthFactory, AccountFactory],
   exports: [AuthFactory, AccountFactory],
 })
