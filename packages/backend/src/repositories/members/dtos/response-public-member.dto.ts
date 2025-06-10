@@ -1,9 +1,6 @@
 import { IsString } from 'class-validator';
 
-export class CreateMemberDto {
+export class ResponsePublicMemberDto {
   @IsString()
   username: string;
-
-  @IsString()
-  password: string;
 }

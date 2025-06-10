@@ -1,6 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Patch, UseGuards } from '@nestjs/common';
 import { AccountOwnerGuard } from 'src/common/guards/account-owner.guard';
 import { NotEmptyBodyPipe } from 'src/common/pipes/not-empty-body.pipe';
+import { ResponseMemberDto } from './dtos/response-member.dto';
 import { UpdateMemberDto } from './dtos/update-member.dto';
 import { MembersRepository } from './member.repository';
 
@@ -8,28 +9,23 @@ import { MembersRepository } from './member.repository';
 export class MembersController {
   constructor(private readonly membersRepository: MembersRepository) {}
 
-  @Get('/:email')
-  async findMember(@Param('email') email: string) {
-    return await this.membersRepository.findOne({ email });
+  @Get('/:username')
+  async findMember(@Param('username') username: string): Promise<ResponseMemberDto> {
+    return await this.membersRepository.findOne({ where: { username } });
   }
 
   @UseGuards(AccountOwnerGuard)
-  @Patch('/:email')
+  @Patch('/:username')
   async updateMember(
-    @Param('email') email: string,
+    @Param('username') username: string,
     @Body(NotEmptyBodyPipe) updateDto: UpdateMemberDto,
-  ) {
-    return await this.membersRepository.update(email, updateDto);
+  ): Promise<void> {
+    await this.membersRepository.update(username, updateDto);
   }
 
   @UseGuards(AccountOwnerGuard)
-  @Delete('/:email')
-  async deleteMember(@Param('email') email: string) {
-    return await this.membersRepository.delete(email);
-  }
-
-  @Get('/:email/challenges')
-  async findChallenges(@Param('email') email: string) {
-    console.log('TODO ', email); //will call repo method of member_challenge
+  @Delete('/:username')
+  async deleteMember(@Param('username') username: string): Promise<void> {
+    await this.membersRepository.delete(username);
   }
 }
