@@ -1,6 +1,7 @@
 import { ChallengeStatus } from '~/components/challenge/challenge';
+import apiFetch from './apiFetch';
 
-const getChallenge = async (challengeId: string) => {
+export const getChallenge = async (challengeId: string) => {
   await new Promise((resolve) => setTimeout(resolve, 1000));
   // Mock data for now
   console.log('getChallenge', challengeId);
@@ -9,7 +10,7 @@ const getChallenge = async (challengeId: string) => {
     name: 'Bicep curl challenge',
     description:
       'This is a challenge to help you stay on track with your goals. You will be able to complete tasks and earn points. You will also be able to see your progress and your ranking. You will also be able to see your friends progress and their ranking. Also, you will be able to see your friends and their progress.',
-    days: [true, false, false, true, false, true, false, false, true, false],
+    days: [true, false, false, true, true, false, false, false, false, false],
     tasks: [
       '100 pushups',
       '100 situps',
@@ -25,7 +26,7 @@ const getChallenge = async (challengeId: string) => {
       '100 planks',
     ],
     currentDay: 4,
-    status: ChallengeStatus.NOT_STARTED,
+    status: ChallengeStatus.COMPLETED,
   });
   //   const response = await apiFetch(`/challenges/${challengeId}`, {
   //     method: 'GET',
@@ -36,5 +37,13 @@ const getChallenge = async (challengeId: string) => {
   //   return response.json();
 };
 
-export { getChallenge };
+export const enrollInChallenge = async (challengeId: string, username: string) => {
+  const response = await apiFetch(`/challenges/${challengeId}/enroll`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ username }),
+  });
+};
 

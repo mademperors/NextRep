@@ -1,8 +1,9 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { useParams } from 'react-router';
-import { getChallenge } from '~/api/challenges';
+import { toast } from 'sonner';
+import { enrollInChallenge, getChallenge } from '~/api/challenges';
 import { useAuth } from '~/components/auth/AuthProvider';
-import { Challenge } from '~/components/challenge/challenge';
+import { Challenge, ChallengeStatus } from '~/components/challenge/challenge';
 import { FullScreenDnaLoader } from '~/components/ui/dna-loader';
 import { Role } from '~/constants/enums/roles.enum';
 import type { Route } from './+types/single-challenge';
@@ -21,12 +22,26 @@ export default function SingleChallenge() {
     queryKey: ['challenge', challengeId],
     queryFn: () => getChallenge(challengeId!),
   });
+  const { mutate: enroll } = useMutation({
+    mutationFn: () => enrollInChallenge(challengeId!, user!.username),
+    onError: (error) => {
+      console.error(error);
+      toast.error('Failed to enroll in challenge');
+    },
+  });
+
+  const getCurrentDay = () => {
+    if (challenge?.status === ChallengeStatus.COMPLETED) {
+      return challenge.days.length;
+    }
+    return challenge?.currentDay || 0;
+  };
 
   if (status === 'success') {
     return (
       <Challenge
         days={challenge.days}
-        currentDay={challenge.currentDay}
+        currentDay={getCurrentDay()}
         status={challenge.status}
         title={challenge.name}
         description={challenge.description}

@@ -37,7 +37,7 @@ export function Challenge({
   const progress = (currentDay / days.length) * 100;
   const completedDays = days.filter((day) => day).length;
   const onDayClick = (day: number) => {
-    if (status === ChallengeStatus.NOT_STARTED || status === ChallengeStatus.COMPLETED) {
+    if (status === ChallengeStatus.NOT_STARTED) {
       setActiveDay(day);
     }
   };
@@ -60,14 +60,18 @@ export function Challenge({
         days={days}
         currentDay={activeDay}
         onDayClick={onDayClick}
-        enableMissedDays={status === ChallengeStatus.ACTIVE}
+        enableMissedDays={status !== ChallengeStatus.NOT_STARTED}
       />
 
-      <ChallengeTask
-        isActive={status === ChallengeStatus.ACTIVE && !days[activeDay]}
-        taskDescription={dayDescriptions[activeDay]}
-        onCompleteTask={onCompleteDay}
-      />
+      {[ChallengeStatus.ACTIVE, ChallengeStatus.NOT_STARTED].includes(status) ? (
+        <ChallengeTask
+          isActive={status === ChallengeStatus.ACTIVE && !days[activeDay]}
+          taskDescription={dayDescriptions[activeDay]}
+          onCompleteTask={onCompleteDay}
+        />
+      ) : (
+        <p className="text-sm text-muted-foreground">You have completed this challenge.</p>
+      )}
 
       {status === ChallengeStatus.NOT_STARTED &&
         (!isEnrolled ? (
