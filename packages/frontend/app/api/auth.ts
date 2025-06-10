@@ -5,23 +5,23 @@ enum Role {
   MEMBER = 'member',
 }
 
-const register = async (email: string, password: string, role: Role) => {
+const register = async (username: string, password: string, role: Role) => {
   const response = await apiFetch('/auth/signUp', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ email, password, role }),
+    body: JSON.stringify({ username, password, role }),
   });
 };
 
-const login = async (email: string, password: string, role: Role) => {
+const login = async (username: string, password: string, role: Role) => {
   const response = await apiFetch('/auth/signIn', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ email, password, role }),
+    body: JSON.stringify({ username, password, role }),
   });
 
   //   return response.json();
@@ -36,3 +36,4 @@ const checkAuth = async () => {
 };
 
 export { checkAuth, login, register };
+

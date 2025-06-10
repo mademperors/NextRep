@@ -17,11 +17,18 @@ export function LoginForm({
   ...props
 }: React.ComponentPropsWithoutRef<'div'> & { role: Role }) {
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const mutation = useMutation({
-    mutationFn: ({ email, password, role }: { email: string; password: string; role: Role }) =>
-      login(email, password, role),
+    mutationFn: ({
+      username,
+      password,
+      role,
+    }: {
+      username: string;
+      password: string;
+      role: Role;
+    }) => login(username, password, role),
     onSuccess: () => {
       toast.success('Logged in successfully');
       navigate('/');
@@ -33,7 +40,7 @@ export function LoginForm({
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    mutation.mutate({ email, password, role });
+    mutation.mutate({ username, password, role });
   };
 
   return (
@@ -47,15 +54,15 @@ export function LoginForm({
           <form onSubmit={handleSubmit}>
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="username">Username</Label>
                 <Input
-                  id="email"
-                  type="email"
+                  id="username"
+                  type="text"
                   placeholder="m@example.com"
                   required
-                  value={email}
-                  autoComplete="email"
-                  onChange={(e) => setEmail(e.target.value)}
+                  value={username}
+                  autoComplete="username"
+                  onChange={(e) => setUsername(e.target.value)}
                 />
               </div>
               <div className="grid gap-2">
@@ -90,3 +97,4 @@ export function LoginForm({
     </div>
   );
 }
+
