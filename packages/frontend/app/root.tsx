@@ -11,6 +11,7 @@ import {
 import { Toaster } from 'sonner';
 import type { Route } from './+types/root';
 import './app.css';
+import { Navigation } from './components/navigation';
 
 // Create a client
 const queryClient = new QueryClient();
@@ -42,6 +43,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
+        <Navigation />
         {children}
         <ScrollRestoration />
         <Scripts />
@@ -85,3 +87,4 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
     </main>
   );
 }
+
