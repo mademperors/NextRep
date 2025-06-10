@@ -1,4 +1,4 @@
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, ManyToMany } from 'typeorm';
 import { Gender } from '../../common/constants/enums/gender.enum';
 import { Goal } from '../../common/constants/enums/goal.enum';
 import { AuthInfo } from './auth-info.interface';
@@ -22,4 +22,7 @@ export class Member extends AuthInfo {
 
   @Column('text', { nullable: true })
   additional_info?: string;
+
+  @ManyToMany(() => Member, { nullable: true, onDelete: 'SET NULL' })
+  friends?: Member[];
 }
