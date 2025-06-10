@@ -11,13 +11,13 @@ import { mealRecommendationExamples } from './prompts/meal-recomendation-example
 export class LlmModuleService {
   constructor(private readonly memberRepository: MembersRepository) {}
 
-  async getRecommendation(email: any): Promise<ResponseLLMDto> {
-    const model = new ChatGoogleGenerativeAI({
+  private readonly googleGenerativeModel = new ChatGoogleGenerativeAI({
       model: 'gemini-2.0-flash',
       temperature: 0,
       apiKey: process.env.GOOGLE_API_KEY,
     });
 
+  async getRecommendation(email: any): Promise<ResponseLLMDto> {
     const member = await this.memberRepository.findOne({ email: email });
 
     const memberChallenges = []; // TODO: call member_challenge repo method to get challenges of member
@@ -34,7 +34,7 @@ export class LlmModuleService {
       Current Challenges: ${JSON.stringify(memberChallenges)}`),
     ];
 
-    const responce = await model.invoke(messages);
+    const responce = await this.googleGenerativeModel.invoke(messages);
     return {
       ai_response: responce.text,
       bmr: bmr,
@@ -46,7 +46,7 @@ export class LlmModuleService {
       throw new BadRequestException('Insufficient member data for BMR calculation.');
     }
 
-    var bmr: number;
+    let bmr: number;
 
     if (member.gender === Gender.MALE) {
       bmr = 10 * member.weight + 6.25 * member.height - 5 * member.age + 5;
