@@ -4,7 +4,7 @@ export class ResponseMemberDto {
   email: string;
   weight: number;
   height: number;
-  gender: number;
+  gender: string;
   age: number;
   goal: string;
   additional_info: string;
