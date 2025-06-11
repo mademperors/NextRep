@@ -5,6 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { ChallengeType } from 'src/common/constants/enums/challenge-types.enum';
 import { Role } from 'src/common/constants/enums/roles.enum';
 import { encodePassword } from 'src/common/utils/bcrypt';
 import { Account } from 'src/database/entities/account.entity';
@@ -75,6 +76,82 @@ export class AccountRepository {
     if (result.affected === 0) {
       throw new NotFoundException('Account not found');
     }
+  }
+
+  async canCreateChallengeType(username: string, challengeType: ChallengeType): Promise<boolean> {
+    const account = await this.findForRelation(username);
+
+    if (account.accountType === Role.ADMIN) {
+      return true;
+    }
+
+    if (account.accountType === Role.MEMBER) {
+      return challengeType === ChallengeType.PRIVATE;
+    }
+
+    return false;
+  }
+
+  async canEnrollInChallenges(username: string): Promise<boolean> {
+    const account = await this.findForRelation(username);
+    return account.accountType === Role.MEMBER; // Only members can enroll
+  }
+
+  // Check if account owns a specific challenge (for ownership validation)
+  async isAccountChallengeOwner(
+    username: string,
+    challengeCreatorUsername: string,
+  ): Promise<boolean> {
+    return username === challengeCreatorUsername;
+  }
+
+  async getChallengePermissions(username: string): Promise<{
+    canCreatePrivate: boolean;
+    canCreateGlobal: boolean;
+    canEnroll: boolean;
+    canManageAny: boolean;
+    accountType: Role;
+  }> {
+    const account = await this.findForRelation(username);
+
+    const isAdmin = account.accountType === Role.ADMIN;
+    const isMember = account.accountType === Role.MEMBER;
+
+    return {
+      canCreatePrivate: isAdmin || isMember,
+      canCreateGlobal: isAdmin,
+      canEnroll: isMember,
+      canManageAny: isAdmin, // Admins can manage any challenge
+      accountType: account.accountType,
+    };
+  }
+
+  async validateChallengeCreation(
+    username: string,
+    challengeType: ChallengeType,
+  ): Promise<Account> {
+    const account = await this.findForRelation(username);
+    const canCreate = await this.canCreateChallengeType(username, challengeType);
+
+    if (!canCreate) {
+      const typeStr = challengeType === ChallengeType.GLOBAL ? 'global' : 'private';
+      throw new ForbiddenException(
+        `Account type ${account.accountType} cannot create ${typeStr} challenges`,
+      );
+    }
+
+    return account;
+  }
+
+  async validateEnrollment(username: string): Promise<Account> {
+    const account = await this.findForRelation(username);
+    const canEnroll = await this.canEnrollInChallenges(username);
+
+    if (!canEnroll) {
+      throw new ForbiddenException('Only members can enroll in challenges');
+    }
+
+    return account;
   }
 
   // Validate account type for specific operations

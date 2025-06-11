@@ -1,11 +1,11 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Challenge } from 'src/database/entities/challenge.entity';
-import { MembersRepository } from 'src/repositories/accounts/members/member.repository';
+import { AccountRepository } from 'src/repositories/accounts/accounts.repository';
 import { TrainingsService } from 'src/repositories/trainings/services/training.service';
 import { FindManyOptions, FindOneOptions, Repository } from 'typeorm';
 import { ICRUD } from '../../interfaces/icrud.interface';
-import { CreateChallengeDto } from '../dto/create-challenge.dto';
+import { CreateChallengeDto, CreateChallengeDtoWithCreator } from '../dto/create-challenge.dto';
 import { UpdateChallengeDto } from '../dto/update-challenge.dto';
 
 type Dtos = {
@@ -21,7 +21,7 @@ const DEFAULT_CHALLENGE_RELATIONS = ['creator', 'trainings', 'enrolled.account']
 export class ChallengesCrudRepository implements ICRUD<Challenge, Dtos, Param> {
   constructor(
     @InjectRepository(Challenge) private readonly challengeRepository: Repository<Challenge>,
-    private readonly membersRepository: MembersRepository,
+    private readonly accountsRepository: AccountRepository,
     private readonly trainingsService: TrainingsService,
   ) {}
 
@@ -41,20 +41,27 @@ export class ChallengesCrudRepository implements ICRUD<Challenge, Dtos, Param> {
     return challenges;
   }
 
-  async create(createDto: CreateChallengeDto): Promise<void> {
-    const creatorMember = await this.membersRepository.findMemberForRelation({
-      username: createDto.creator,
-    });
+  async create(createDto: CreateChallengeDtoWithCreator): Promise<void> {
+    const creatorMember = await this.accountsRepository.findForRelation(createDto.creator);
 
     if (!createDto.trainingIds || createDto.trainingIds.length === 0)
       throw new BadRequestException('A challenge must include at least one training.');
 
     const trainingEntities = await this.trainingsService.findTrainingsByIds(createDto.trainingIds);
 
-    if (trainingEntities.length !== createDto.trainingIds.length) {
-      const foundIds = new Set(trainingEntities.map((t) => t.id));
-      const missingIds = createDto.trainingIds.filter((id) => !foundIds.has(id));
-      throw new BadRequestException(`Trainings not found with IDs: ${missingIds.join(', ')}.`);
+    // Check for both missing and unauthorized trainings in one validation
+    const foundAuthorizedIds = new Set(
+      trainingEntities
+        .filter((training) => training.creator.username === creatorMember.username)
+        .map((training) => training.id),
+    );
+
+    const invalidIds = createDto.trainingIds.filter((id) => !foundAuthorizedIds.has(id));
+
+    if (invalidIds.length > 0) {
+      throw new BadRequestException(
+        `Trainings not found or unauthorized with IDs: ${invalidIds.join(', ')}.`,
+      );
     }
 
     const newChallenge = this.challengeRepository.create({
@@ -63,37 +70,42 @@ export class ChallengesCrudRepository implements ICRUD<Challenge, Dtos, Param> {
       creator: creatorMember,
       trainings: trainingEntities,
       duration: trainingEntities.length,
-      currentDay: 0,
+      currentDay: 1,
     });
-    console.log(newChallenge);
 
     await this.challengeRepository.save(newChallenge);
   }
 
   async update(id: Param | number, updateDto: UpdateChallengeDto): Promise<void> {
-    // const existingChallenge = await this.challengeRepository.findOneOrFail({
-    //   where: { id: id as number },
-    //   relations: DEFAULT_CHALLENGE_RELATIONS,
-    // });
-    // const scalarUpdates: { challenge_info?: string; challenge_type?: ChallengeType } = {};
-    // if (updateDto.challengeInfo !== undefined) {
-    //   scalarUpdates.challenge_info = updateDto.challengeInfo;
-    // }
-    // if (updateDto.challengeType !== undefined) {
-    //   scalarUpdates.challenge_type = updateDto.challengeType;
-    // }
-    // const mergedChallenge = this.challengeRepository.merge(existingChallenge, scalarUpdates);
-    // // If trainingIds are provided, fetch them and update the relation
-    // if (updateDto.trainingIds !== undefined) {
-    //   // The validation for trainingIds (e.g., must not be empty, existence, and member's own trainings)
-    //   // has been moved to the service. So here, we just fetch and assign.
-    //   const newTrainingEntities = await this.trainingsService.findTrainingsByIds(
-    //     updateDto.trainingIds,
-    //   );
-    //   mergedChallenge.trainings = newTrainingEntities;
-    //   mergedChallenge.duration = newTrainingEntities.length; // Update duration based on new trainings
-    // }
-    // await this.challengeRepository.save(mergedChallenge);
+    const existingChallenge = await this.challengeRepository.findOneOrFail({
+      where: { id: id as number },
+      relations: DEFAULT_CHALLENGE_RELATIONS,
+    });
+
+    // Prepare scalar updates
+    const scalarUpdates: Partial<Challenge> = {};
+
+    if (updateDto.challengeInfo !== undefined) {
+      scalarUpdates.challengeInfo = updateDto.challengeInfo;
+    }
+
+    if (updateDto.challengeType !== undefined) {
+      scalarUpdates.challengeType = updateDto.challengeType;
+    }
+
+    // Merge scalar updates
+    const mergedChallenge = this.challengeRepository.merge(existingChallenge, scalarUpdates);
+
+    // If trainingIds are provided, fetch them and update the relation
+    if (updateDto.trainingIds !== undefined) {
+      const newTrainingEntities = await this.trainingsService.findTrainingsByIds(
+        updateDto.trainingIds,
+      );
+      mergedChallenge.trainings = newTrainingEntities;
+      mergedChallenge.duration = newTrainingEntities.length; // Update duration based on new trainings
+    }
+
+    await this.challengeRepository.save(mergedChallenge);
   }
 
   async delete(id: Param | number): Promise<void> {

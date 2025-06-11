@@ -29,14 +29,14 @@ export class ChallengesController {
 
   @Get('created')
   async getCreatedChallenges(@Req() req: Request): Promise<ResponseChallengeDto[]> {
-    const memberUsername: string = req.user!.username;
-    return await this.challengesService.getCreatedChallenges(memberUsername);
+    const username: string = req.user!.username;
+    return await this.challengesService.getCreatedChallenges(username);
   }
 
   @Get('me')
   async getEnrolledChallenges(@Req() req: Request): Promise<ResponseChallengeDto[]> {
-    const memberUsername: string = req.user!.username;
-    return await this.challengesService.getEnrolledChallenges(memberUsername);
+    const username: string = req.user!.username;
+    return await this.challengesService.getEnrolledChallenges(username);
   }
 
   @Get('global')
@@ -66,8 +66,7 @@ export class ChallengesController {
   @Post()
   async createChallenge(@Body() dto: CreateChallengeDto, @Req() req: Request): Promise<void> {
     const user = req.user!;
-    dto.creator = user.username;
-    await this.challengesService.createChallenge(dto, user.role);
+    await this.challengesService.createChallenge(dto, user.username);
   }
 
   @UseGuards(ChallengeOwnerGuard)
@@ -83,7 +82,8 @@ export class ChallengesController {
 
   @Patch(':id/enroll')
   async enrollInChallenge(@Param('id') id: number, @Req() req: Request): Promise<void> {
-    await this.challengesService.enrollInChallenge(id, req.user!.username);
+    const user = req.user!;
+    await this.challengesService.enrollInChallenge(id, user.username);
   }
 
   @UseGuards(ChallengeOwnerGuard)
@@ -91,10 +91,4 @@ export class ChallengesController {
   async deleteChallenge(@Param('id') id: number): Promise<void> {
     await this.challengesCrudRepository.delete(id);
   }
-
-  // @UseGuards(ChallengeOwnerGuard)
-  // @Post(':id/start')
-  // async startChallenge(@Param('id') id: number) {
-
-  // }
 }
