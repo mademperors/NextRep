@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ChallengeType } from 'src/common/constants/enums/challenge-types.enum';
 import { Role } from 'src/common/constants/enums/roles.enum';
@@ -76,6 +76,16 @@ export class ChallengesService {
 
   async createChallenge(dto: CreateChallengeDto, creator: string): Promise<void> {
     const fullDto: CreateChallengeDtoWithCreator = { ...dto, creator };
+    const startDate = new Date(dto.startDate + 'T00:00:00Z');
+
+    const now = new Date();
+    const tomorrow = new Date(
+      Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1, 0, 0, 0, 0),
+    );
+
+    if (startDate < tomorrow) {
+      throw new BadRequestException('Challenge start date must be at least tomorrow (UTC)');
+    }
 
     // Additional validation using the account repository
     await this.accountRepository.validateChallengeCreation(fullDto.creator, dto.challengeType);
@@ -117,6 +127,13 @@ export class ChallengesService {
           );
         }
       }
+    }
+
+    const updateData: Partial<UpdateChallengeDto> = { ...dto };
+    if (dto.startDate !== undefined) {
+      const startDate = new Date(dto.startDate);
+      startDate.setHours(5, 59, 0, 0); // Set to 5:59:00 AM
+      updateData.startDate = startDate.toISOString();
     }
 
     await this.challengesCrudRepository.update(id, dto);
@@ -187,5 +204,30 @@ export class ChallengesService {
     });
 
     return challenge.creator.username;
+  }
+
+  async markDayAsCompleted(username: string, challengeId: number): Promise<void> {
+    const accountChallenge = await this.accountChallengeRepository.findOneOrFail({
+      where: { accountUsername: username, challengeId },
+      relations: ['challenge'],
+    });
+
+    const currentDay = accountChallenge.challenge.currentDay;
+    if (currentDay <= 0 || currentDay > accountChallenge.challenge.duration) {
+      throw new ForbiddenException('Invalid current day for challenge');
+    }
+
+    // Ensure the completedDays array is properly sized
+    while (accountChallenge.completedDays.length < accountChallenge.challenge.duration) {
+      accountChallenge.completedDays.push(false);
+    }
+
+    const index = currentDay - 1;
+    if (accountChallenge.completedDays[index]) {
+      return;
+    }
+
+    accountChallenge.completedDays[index] = true;
+    await this.accountChallengeRepository.save(accountChallenge);
   }
 }

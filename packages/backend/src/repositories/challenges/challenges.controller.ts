@@ -91,4 +91,10 @@ export class ChallengesController {
   async deleteChallenge(@Param('id') id: number): Promise<void> {
     await this.challengesCrudRepository.delete(id);
   }
+
+  @Post(':id/completed')
+  async markTodayAsCompleted(@Param('id') challengeId: number, @Req() req: Request): Promise<void> {
+    const user = req.user as { username: string };
+    await this.challengesService.markDayAsCompleted(user.username, challengeId);
+  }
 }

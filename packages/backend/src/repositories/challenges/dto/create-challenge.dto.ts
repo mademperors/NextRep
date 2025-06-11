@@ -1,4 +1,12 @@
-import { ArrayMinSize, IsArray, IsEnum, IsNumber, IsString } from 'class-validator';
+import {
+  ArrayMinSize,
+  IsArray,
+  IsDateString,
+  IsEnum,
+  IsNumber,
+  IsString,
+  Matches,
+} from 'class-validator';
 import { ChallengeType } from 'src/common/constants/enums/challenge-types.enum';
 
 export class CreateChallengeDto {
@@ -7,6 +15,10 @@ export class CreateChallengeDto {
 
   @IsEnum(ChallengeType)
   challengeType: ChallengeType;
+
+  @IsDateString()
+  @Matches(/^\d{4}-\d{2}-\d{2}$/, { message: 'Date must be in YYYY-MM-DD format' })
+  startDate: string; // Date string in YYYY-MM-DD format
 
   @IsArray()
   @IsNumber({}, { each: true })

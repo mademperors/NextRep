@@ -64,13 +64,16 @@ export class ChallengesCrudRepository implements ICRUD<Challenge, Dtos, Param> {
       );
     }
 
+    const startDate = new Date(createDto.startDate);
+    startDate.setHours(5, 59, 0, 0);
+
     const newChallenge = this.challengeRepository.create({
       challengeInfo: createDto.challengeInfo,
       challengeType: createDto.challengeType,
       creator: creatorMember,
       trainings: trainingEntities,
       duration: trainingEntities.length,
-      currentDay: 1,
+      startDate: startDate,
     });
 
     await this.challengeRepository.save(newChallenge);

@@ -9,6 +9,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { ChallengeType } from '../../common/constants/enums/challenge-types.enum';
+import { Status } from '../../common/constants/enums/status.enum';
 import { AccountChallenge } from './account-challenge.entity';
 import { Account } from './account.entity';
 import { Training } from './training.entity';
@@ -27,8 +28,14 @@ export class Challenge {
   @Column({ type: 'integer', nullable: false })
   duration: number;
 
-  @Column({ type: 'integer', nullable: false, default: 1 })
+  @Column({ type: 'integer', nullable: false, default: 0 })
   currentDay: number;
+
+  @Column({ type: 'date', nullable: false })
+  startDate: Date;
+
+  @Column('enum', { enum: Status, nullable: false, default: Status.ENROLLMENT })
+  status: Status;
 
   @ManyToOne(() => Account, { nullable: false, onDelete: 'RESTRICT' })
   @JoinColumn({ name: 'creator', referencedColumnName: 'username' })
