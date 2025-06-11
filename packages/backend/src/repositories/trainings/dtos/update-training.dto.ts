@@ -7,5 +7,5 @@ export class UpdateTrainingDto {
 
   @IsString()
   @IsOptional()
-  training_info?: string;
+  trainingInfo?: string;
 }

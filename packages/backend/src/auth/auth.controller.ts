@@ -14,7 +14,6 @@ import { UserPayload } from 'src/common/constants/types/user-payload.interface';
 import { AuthService } from './auth.service';
 import { Public } from './decorators/public.decorator';
 import { AuthDto } from './dtos/auth.dto';
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 
 @Controller('auth')
@@ -31,7 +30,6 @@ export class AuthController {
   }
 
   @HttpCode(HttpStatus.OK)
-  @UseGuards(JwtAuthGuard)
   @Post('signOut')
   signOut(@Res({ passthrough: true }) res: Response): void {
     this.authService.clearCookie(res);

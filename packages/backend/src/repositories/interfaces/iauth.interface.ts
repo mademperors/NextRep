@@ -1,5 +1,5 @@
-import { AuthInfo } from 'src/database/entities/auth-info.interface';
+import { Account } from 'src/database/entities/account.entity';
 
 export interface IAUTH {
-  getCredentials(email: string): Promise<AuthInfo | null>;
+  getCredentials(email: string): Promise<Account | null>;
 }
