@@ -32,7 +32,7 @@ export function LoginForm({
     }) => login(username, password, role),
     onSuccess: () => {
       toast.success('Logged in successfully');
-      navigate('/');
+      navigate('/profile');
     },
     onError: () => {
       toast.error('Failed to login');
@@ -107,4 +107,3 @@ export function LoginForm({
     </div>
   );
 }
-
