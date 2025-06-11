@@ -2,11 +2,11 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ChallengeType } from 'src/common/constants/enums/challenge-types.enum';
 import { Role } from 'src/common/constants/enums/roles.enum';
+import { AccountChallenge } from 'src/database/entities/account-challenge.entity';
 import { Challenge } from 'src/database/entities/challenge.entity';
 import { Member } from 'src/database/entities/member.entity';
-import { MemberChallenge } from 'src/database/entities/memberChallenge.entity';
-import { ResponsePublicMemberDto } from 'src/repositories/members/dtos/response-public-member.dto';
-import { MembersRepository } from 'src/repositories/members/member.repository';
+import { ResponsePublicMemberDto } from 'src/repositories/accounts/members/dtos/response-public-member.dto';
+import { MembersRepository } from 'src/repositories/accounts/members/member.repository';
 import { ResponseTrainingDto } from 'src/repositories/trainings/dtos/response-training.dto';
 import { TrainingsService } from 'src/repositories/trainings/services/training.service';
 import { Repository } from 'typeorm';
@@ -20,32 +20,38 @@ export class ChallengesService {
   constructor(
     private readonly challengesCrudRepository: ChallengesCrudRepository,
     @InjectRepository(Challenge) private readonly challengeRepository: Repository<Challenge>,
-    @InjectRepository(MemberChallenge)
-    private readonly memberChallengeRepository: Repository<MemberChallenge>,
-    private readonly membersRepository: MembersRepository,
+    @InjectRepository(AccountChallenge)
+    private readonly accountChallengeRepository: Repository<AccountChallenge>,
+    private readonly accountRepository: MembersRepository,
     private readonly trainingsService: TrainingsService,
   ) {}
 
-  async getCreatedChallenges(memberUsername: string): Promise<ResponseChallengeDto[]> {
+  async getCreatedChallenges(accountUsername: string): Promise<ResponseChallengeDto[]> {
     const challenges = await this.challengesCrudRepository.find({
-      where: { creator: { username: memberUsername } },
+      where: { creator: { username: accountUsername } },
     });
     return challenges.map((challenge) => this.mapChallengeToResponseDto(challenge));
   }
 
-  async getEnrolledChallenges(memberUsername: string): Promise<ResponseChallengeDto[]> {
-    const member = await this.membersRepository.findMemberForRelation({
-      username: memberUsername,
+  async getEnrolledChallenges(accountUsername: string): Promise<ResponseChallengeDto[]> {
+    const member = await this.accountRepository.findMemberForRelation({
+      username: accountUsername,
     });
     const challenges = await this.challengesCrudRepository.find({
-      where: { enrolledMembers: { member: { username: member.username } } },
+      where: { enrolled: { account: { username: member.username } } },
     });
-    return challenges.map((challenge) => this.mapChallengeToResponseDto(challenge));
+
+    return challenges.map((challenge) => {
+      const mappedChallenge = this.mapChallengeToResponseDto(challenge);
+      // Manually delete the property for this specific endpoint's output
+      delete mappedChallenge.enrolledUsernames;
+      return mappedChallenge;
+    });
   }
 
   async getGlobalChallenges(): Promise<ResponseChallengeDto[]> {
     const challenges = await this.challengesCrudRepository.find({
-      where: { challenge_type: ChallengeType.GLOBAL },
+      where: { challengeType: ChallengeType.GLOBAL },
     });
     return challenges.map((challenge) => this.mapChallengeToResponseDto(challenge));
   }
@@ -57,8 +63,8 @@ export class ChallengesService {
 
   async getEnrolledMembers(id: number): Promise<ResponsePublicMemberDto[]> {
     const challenge = await this.challengesCrudRepository.findOne({ where: { id } });
-    return challenge.enrolledMembers.map((enrolled) => ({
-      username: enrolled.member.username,
+    return challenge.enrolled.map((enrolled) => ({
+      username: enrolled.account.username,
     }));
   }
 
@@ -67,8 +73,9 @@ export class ChallengesService {
 
     // Assuming ResponseTrainingDto matches the structure of your Training entity
     return challenge.trainings.map((training) => ({
-      ...training,
-      creator: training.creator.username,
+      id: training.id,
+      title: training.title,
+      trainingInfo: training.trainingInfo,
     }));
   }
 
@@ -89,11 +96,9 @@ export class ChallengesService {
   async updateChallenge(
     id: number,
     dto: UpdateChallengeDto,
-    memberUsername: string,
+    accountUsername: string,
     role: Role,
   ): Promise<void> {
-    const existingChallenge = await this.challengesCrudRepository.findOne({ where: { id } });
-
     if (dto.trainingIds !== undefined) {
       if (dto.trainingIds.length === 0) {
         throw new BadRequestException('A challenge must include at least one training.');
@@ -114,7 +119,7 @@ export class ChallengesService {
       // Specific validation for members: Can only use their own trainings
       if (role === Role.MEMBER) {
         // Fetch all trainings created by the current member
-        const memberTrainings = await this.trainingsService.findTrainings(memberUsername);
+        const memberTrainings = await this.trainingsService.findTrainings(accountUsername);
         const memberTrainingIds = new Set(memberTrainings.map((t) => t.id));
 
         const invalidTrainingIdsForMember = newTrainingEntities
@@ -133,23 +138,24 @@ export class ChallengesService {
     await this.challengesCrudRepository.update(id, dto);
   }
 
-  async enrollInChallenge(challengeId: number, memberUsername: string): Promise<void> {
-    const challenge = await this.challengesCrudRepository.findOne({ where: { id: challengeId } });
-
-    const member = await this.membersRepository.findMemberForRelation({ username: memberUsername });
-
-    const existingEnrollment = await this.memberChallengeRepository.findOne({
-      where: {
-        member_username: memberUsername,
-        challenge_id: challengeId,
-      },
-    });
-
-    if (existingEnrollment) {
-      throw new BadRequestException('You are already enrolled in this challenge.');
-    }
-
-    await this.addMemberToChallenge(challenge, member);
+  async enrollInChallenge(challengeId: number, accountUsername: string): Promise<void> {
+    // const challenge = await this.challengesCrudRepository.findOne({ where: { id: challengeId } });
+    // const account = await this.accountRepository.findOne({
+    //   where: { username: accountUsername },
+    // });
+    // if (account.userType !== Role.MEMBER) {
+    //   throw new ForbiddenException('Only members can enroll in challenges');
+    // }
+    // const existingEnrollment = await this.accountChallengeRepository.findOne({
+    //   where: {
+    //     accountUsername: accountUsername,
+    //     challengeId: challengeId,
+    //   },
+    // });
+    // if (existingEnrollment) {
+    //   throw new BadRequestException('You are already enrolled in this challenge.');
+    // }
+    // await this.addMemberToChallenge(challenge, member);
   }
 
   async deleteChallenge(id: number): Promise<void> {
@@ -157,35 +163,33 @@ export class ChallengesService {
   }
 
   private async addMemberToChallenge(challenge: Challenge, member: Member): Promise<void> {
-    // Initialize completed_days array based on challenge duration
-    const completedDays = Array(challenge.duration).fill(false);
-
-    const newMemberChallenge = this.memberChallengeRepository.create({
-      member_username: member.username,
-      challenge_id: challenge.id,
-      member: member, // Establish relation to Member entity
-      challenge: challenge, // Establish relation to Challenge entity
-      completed_days: completedDays, // Set the initial state of completed days
-    });
-
-    await this.memberChallengeRepository.save(newMemberChallenge);
+    // // Initialize completed_days array based on challenge duration
+    // const completedDays = Array(challenge.duration).fill(false);
+    // const newMemberChallenge = this.accountChallengeRepository.create({
+    //   accountUsername: member.username,
+    //   challengeId: challenge.id,
+    //   member: member, // Establish relation to Member entity
+    //   challenge: challenge, // Establish relation to Challenge entity
+    //   completedDays: completedDays, // Set the initial state of completed days
+    // });
+    // await this.accountChallengeRepository.save(newMemberChallenge);
   }
 
   private mapChallengeToResponseDto(challenge: Challenge): ResponseChallengeDto {
     return {
       id: challenge.id,
-      challenge_info: challenge.challenge_info,
-      challenge_type: challenge.challenge_type,
+      challengeInfo: challenge.challengeInfo,
+      challengeType: challenge.challengeType,
       duration: challenge.duration,
-      current_day: challenge.current_day,
+      currentDay: challenge.currentDay,
       // Map creator object to its username string
       creator: challenge.creator.username,
       trainingIds: challenge.trainings ? challenge.trainings.map((training) => training.id) : [],
       // Map enrolledMembers (ChallengeEnrollment entities) to an array of usernames
-      enrolledUsernames: challenge.enrolledMembers
-        ? challenge.enrolledMembers
-            .filter((enrollment) => enrollment.member) // Ensure member exists
-            .map((enrollment) => enrollment.member.username)
+      enrolledUsernames: challenge.enrolled
+        ? challenge.enrolled
+            .filter((enrollment) => enrollment.account) // Ensure member exists
+            .map((enrollment) => enrollment.account.username)
         : [],
     };
   }

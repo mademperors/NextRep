@@ -1,13 +1,17 @@
 import { ChallengeType } from 'src/common/constants/enums/challenge-types.enum';
 
+export const CHALLENGE_GROUPS = {
+  ENROLLED_CHALLENGES: 'enrolled-challenges',
+};
+
 export class ResponseChallengeDto {
   id: number;
-  challenge_info: string;
-  challenge_type: ChallengeType;
+  challengeInfo: string;
+  challengeType: ChallengeType;
   duration: number;
-  current_day: number;
+  currentDay: number;
 
   creator: string;
   trainingIds: number[];
-  enrolledUsernames: string[];
+  enrolledUsernames?: string[];
 }

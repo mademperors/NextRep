@@ -2,11 +2,11 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { plainToInstance } from 'class-transformer';
 import { encodePassword } from 'src/common/utils/bcrypt';
+import { Account } from 'src/database/entities/account.entity';
 import { Admin } from 'src/database/entities/admin.entity';
-import { AuthInfo } from 'src/database/entities/auth-info.interface';
+import { IAUTH } from 'src/repositories/interfaces/iauth.interface';
+import { ICRUD } from 'src/repositories/interfaces/icrud.interface';
 import { FindManyOptions, FindOneOptions, Repository } from 'typeorm';
-import { IAUTH } from '../interfaces/iauth.interface';
-import { ICRUD } from '../interfaces/icrud.interface';
 import { CreateAdminDto } from './dtos/create-admin.dto';
 import { ResponseAdminDto } from './dtos/response-admin.dto';
 import { UpdateAdminDto } from './dtos/update-admin.dto';
@@ -52,7 +52,7 @@ export class AdminsRepository implements ICRUD<Admin, Dtos, Param>, IAUTH {
     if (deleted.affected === 0) throw new NotFoundException(`Admin not found`);
   }
 
-  async getCredentials(username: Param): Promise<AuthInfo | null> {
+  async getCredentials(username: Param): Promise<Account | null> {
     return await this.adminsRepository.findOne({
       where: { username },
       select: ['username', 'password'],

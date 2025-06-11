@@ -1,9 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Training } from 'src/database/entities/training.entity';
+import { MembersRepository } from 'src/repositories/accounts/members/member.repository';
 import { FindManyOptions, FindOneOptions, Repository } from 'typeorm';
 import { ICRUD } from '../../interfaces/icrud.interface';
-import { MembersRepository } from '../../members/member.repository';
 import { CreateTrainingDto } from '../dtos/create-training.dto';
 import { UpdateTrainingDto } from '../dtos/update-training.dto';
 
@@ -38,7 +38,7 @@ export class TrainingsCrudRepository implements ICRUD<Training, Dtos, Param> {
 
     const trainingEntity = this.trainingsRepository.create({
       title: createDto.title,
-      training_info: createDto.training_info,
+      trainingInfo: createDto.trainingInfo,
       creator: creatorMember,
     });
 

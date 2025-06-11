@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common';
 import { Request } from 'express';
 import { ChallengeOwnerGuard } from 'src/common/guards/challenge-owner.guard';
-import { ResponsePublicMemberDto } from '../members/dtos/response-public-member.dto';
+import { ResponsePublicMemberDto } from '../accounts/members/dtos/response-public-member.dto';
 import { ResponseTrainingDto } from '../trainings/dtos/response-training.dto';
 import { CreateChallengeDto } from './dto/create-challenge.dto';
 import { ResponseChallengeDto } from './dto/response-challenge.dto';
@@ -91,4 +91,10 @@ export class ChallengesController {
   async deleteChallenge(@Param('id') id: number): Promise<void> {
     await this.challengesCrudRepository.delete(id);
   }
+
+  // @UseGuards(ChallengeOwnerGuard)
+  // @Post(':id/start')
+  // async startChallenge(@Param('id') id: number) {
+
+  // }
 }
