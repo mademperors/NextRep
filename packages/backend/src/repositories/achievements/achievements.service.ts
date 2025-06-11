@@ -6,15 +6,31 @@ import { Repository } from 'typeorm';
 import { CreateAchievementDto } from './dto/create-achievement.dto';
 import { ResponseAchivementsDto } from './dto/responce-achivements.dto';
 import { UpdateAchievementDto } from './dto/update-achievement.dto';
+import { ChallengesCrudRepository } from '../challenges/services/challenges-crud.repository';
 
 @Injectable()
 export class AchivementsService {
+
   constructor(
     @InjectRepository(Achivement)
     private readonly achivementRepository: Repository<Achivement>,
     @InjectRepository(Member)
     private readonly memberRepository: Repository<Member>,
+    private readonly challengesRepository: ChallengesCrudRepository, 
   ) {}
+
+    async getMyAchievements(username: string) {
+    return this.memberRepository.findOne({
+      where: { username },
+      relations: ['achivements'],
+    }).then(member => {
+      if (!member) throw new BadRequestException('Member not found');
+      return { achivements: member.achivements || [] };
+    });
+  }
+
+  async getGenericAchievements(username: string) {
+  }
 
   async create(createAchivementDto: CreateAchievementDto): Promise<ResponseAchivementsDto> {
     const achivement = this.achivementRepository.create();
