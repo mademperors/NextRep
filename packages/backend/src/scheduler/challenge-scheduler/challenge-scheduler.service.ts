@@ -24,7 +24,7 @@ export class ChallengeSchedulerService {
 
     try {
       const now = new Date();
-      now.setHours(6, 0, 0, 0); // Set to today 6:00 AM for comparison
+      now.setUTCHours(6, 0, 0, 0); // Set to today 6:00 AM for comparison
 
       // Find all challenges that should be updated today
       const challengesToUpdate = await this.challengeRepository
@@ -64,7 +64,8 @@ export class ChallengeSchedulerService {
   ): Promise<{ updated: boolean; completed: boolean }> {
     try {
       // Calculate which day the challenge should be on
-      const timeDiff = currentTime.getTime() - challenge.startDate.getTime();
+      const timeDiff = currentTime.getTime() - new Date(challenge.startDate).getTime();
+
       const daysSinceStart = Math.floor(timeDiff / (1000 * 60 * 60 * 24)) + 1;
 
       // Only update if we need to advance the day
@@ -123,13 +124,17 @@ export class ChallengeSchedulerService {
   }
 
   // Optional: Get challenges scheduled for today
-  async getChallengesForToday(): Promise<Challenge[]> {
-    const today = new Date();
-    today.setHours(6, 0, 0, 0);
+  async getChallengesForToday(skip?: number): Promise<Challenge[]> {
+    const day = new Date();
+    day.setUTCHours(6, 0, 0, 0);
+
+    if (skip && skip > 0) {
+      day.setUTCDate(day.getUTCDate() + skip);
+    }
 
     return this.challengeRepository
       .createQueryBuilder('challenge')
-      .where('challenge.startDate <= :today', { today })
+      .where('challenge.startDate <= :day', { day })
       .andWhere('challenge.currentDay < challenge.duration')
       .getMany();
   }
@@ -139,7 +144,8 @@ export class ChallengeSchedulerService {
     this.logger.log('Manual challenge update triggered');
 
     const now = new Date();
-    const challengesToUpdate = await this.getChallengesForToday();
+    now.setUTCHours(6, 0, 0, 0);
+    const challengesToUpdate = await this.getChallengesForToday(2);
 
     let updatedCount = 0;
     let completedCount = 0;

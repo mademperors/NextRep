@@ -97,4 +97,10 @@ export class ChallengesController {
     const user = req.user as { username: string };
     await this.challengesService.markDayAsCompleted(user.username, challengeId);
   }
+
+  @Get(':id/progress')
+  async getChallengeProgress(@Param('id') id: number, @Req() req: Request) {
+    const user = req.user as { username: string };
+    return await this.challengesService.getCompletedDays(id, user.username);
+  }
 }
