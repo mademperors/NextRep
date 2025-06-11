@@ -230,4 +230,15 @@ export class ChallengesService {
     accountChallenge.completedDays[index] = true;
     await this.accountChallengeRepository.save(accountChallenge);
   }
+
+  async getCompletedDays(challengeId: number, accountUsername: string): Promise<boolean[]> {
+    const record = await this.accountChallengeRepository.findOneOrFail({
+      where: {
+        challengeId,
+        accountUsername,
+      },
+    });
+
+    return record.completedDays;
+  }
 }
