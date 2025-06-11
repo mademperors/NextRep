@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { ChallengeStatus } from '~/components/challenge/challenge';
+import type { CreateChallengeDto } from '~/components/challenge/challenge-create';
 import apiFetch from './apiFetch';
 
 const challengeSchema = z.object({
@@ -34,8 +35,8 @@ const challenge1 = {
     '100 lunges',
     '100 planks',
   ],
-  currentDay: 4,
-  status: ChallengeStatus.COMPLETED,
+  currentDay: 5,
+  status: ChallengeStatus.ACTIVE,
 };
 const mockChallenges: Challenge[] = [
   challenge1,
@@ -85,6 +86,16 @@ export const enrollInChallenge = async (challengeId: string, username: string) =
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({ username }),
+  });
+};
+
+export const createChallenge = async (challenge: CreateChallengeDto) => {
+  const response = await apiFetch('/challenges', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(challenge),
   });
 };
 
