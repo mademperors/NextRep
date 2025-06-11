@@ -1,4 +1,4 @@
-import { Column,Column, Entity, JoinTable, ManyToMany } from 'typeorm';
+import { ChildEntity, Column, Entity, JoinTable, ManyToMany } from 'typeorm';
 import { Gender } from '../../common/constants/enums/gender.enum';
 import { Goal } from '../../common/constants/enums/goal.enum';
 import { Role } from '../../common/constants/enums/roles.enum';
