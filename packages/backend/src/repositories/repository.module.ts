@@ -1,14 +1,10 @@
 import { Module } from '@nestjs/common';
-import { AdminsModule } from './admins/admin.module';
+import { AccountsModule } from './accounts/accounts.module';
 import { ChallengesModule } from './challenges/challenges.module';
-import { AccountFactory } from './factories/account.factory';
-import { AuthFactory } from './factories/auth.factory';
-import { MembersModule } from './members/member.module';
 import { TrainingsModule } from './trainings/training.module';
 
 @Module({
-  imports: [MembersModule, AdminsModule, ChallengesModule, TrainingsModule],
-  providers: [AuthFactory, AccountFactory],
-  exports: [AuthFactory, AccountFactory],
+  imports: [AccountsModule, ChallengesModule, TrainingsModule],
+  exports: [AccountsModule],
 })
 export class RepositoryModule {}

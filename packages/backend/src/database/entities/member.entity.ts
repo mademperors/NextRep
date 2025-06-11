@@ -1,10 +1,11 @@
-import { Column, Entity } from 'typeorm';
+import { ChildEntity, Column } from 'typeorm';
 import { Gender } from '../../common/constants/enums/gender.enum';
 import { Goal } from '../../common/constants/enums/goal.enum';
-import { AuthInfo } from './auth-info.interface';
+import { Role } from '../../common/constants/enums/roles.enum';
+import { Account } from './account.entity';
 
-@Entity('member')
-export class Member extends AuthInfo {
+@ChildEntity(Role.MEMBER)
+export class Member extends Account {
   @Column('decimal', { precision: 4, scale: 1, nullable: true })
   weight?: number;
 
@@ -21,5 +22,5 @@ export class Member extends AuthInfo {
   goal?: Goal;
 
   @Column('text', { nullable: true })
-  additional_info?: string;
+  additionalInfo?: string;
 }

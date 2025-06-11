@@ -1,67 +1,100 @@
-import { Controller } from '@nestjs/common';
-import { ChallengesAuxRepository } from './services/challenges-aux.repository';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
+import { Request } from 'express';
+import { ChallengeOwnerGuard } from 'src/common/guards/challenge-owner.guard';
+import { ResponsePublicMemberDto } from '../accounts/members/dtos/response-public-member.dto';
+import { ResponseTrainingDto } from '../trainings/dtos/response-training.dto';
+import { CreateChallengeDto } from './dto/create-challenge.dto';
+import { ResponseChallengeDto } from './dto/response-challenge.dto';
+import { UpdateChallengeDto } from './dto/update-challenge.dto';
+import { ChallengesCrudRepository } from './services/challenges-crud.repository';
+import { ChallengesService } from './services/challenges.service';
 
 @Controller('challenges')
 export class ChallengesController {
-  constructor(private readonly challengesAuxRepository: ChallengesAuxRepository) {}
+  constructor(
+    private readonly challengesService: ChallengesService,
+    private readonly challengesCrudRepository: ChallengesCrudRepository,
+  ) {}
 
-  // // // READ
-  // @Get('created')
-  // getCreatedChallenges(@Req() req: Request) {
-  //   return this.challengesAuxRepository.getCreatedChallenges(req.user!.email);
-  // }
+  @Get('created')
+  async getCreatedChallenges(@Req() req: Request): Promise<ResponseChallengeDto[]> {
+    const username: string = req.user!.username;
+    return await this.challengesService.getCreatedChallenges(username);
+  }
 
-  // // GET /challenges/me
-  // @Get('me')
-  // getEnrolledChallenges(@Req() req: Request) {
-  //   return this.challengesAuxRepository.getEnrolledChallenges(req.user!.email);
-  // }
+  @Get('me')
+  async getEnrolledChallenges(@Req() req: Request): Promise<ResponseChallengeDto[]> {
+    const username: string = req.user!.username;
+    return await this.challengesService.getEnrolledChallenges(username);
+  }
 
-  // // GET /challenges/global
-  // @Get('global')
-  // getGlobalChallenges() {
-  //   return this.challengesAuxRepository.getGlobalChallenges();
-  // }
+  @Get('global')
+  async getGlobalChallenges(): Promise<ResponseChallengeDto[]> {
+    return await this.challengesService.getGlobalChallenges();
+  }
 
-  // // GET /challenges/:id
-  // @Get(':id')
-  // getChallengeById(@Param('id', ParseIntPipe) id: number) {
-  //   return this.challengesAuxRepository.getChallengeById(id);
-  // }
+  @Get(':id')
+  async getChallengeById(@Param('id', ParseIntPipe) id: number): Promise<ResponseChallengeDto> {
+    return await this.challengesService.getChallengeById(id);
+  }
 
-  // // GET /challenge/:id/enrolled
-  // @Get(':id/enrolled')
-  // getChallengeEnrolled(@Param('id', ParseIntPipe) id: number) {
-  //   return this.challengesAuxRepository.getEnrolledMembers(id);
-  // }
+  @Get(':id/enrolled')
+  async getChallengeEnrolled(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<ResponsePublicMemberDto[]> {
+    return await this.challengesService.getEnrolledMembers(id);
+  }
 
-  // // GET /challenge/:id/trainings
-  // @Get(':id/trainings')
-  // getChallengeTrainings(@Param('id', ParseIntPipe) id: number) {
-  //   return this.challengesAuxRepository.getChallengeTrainings(id);
-  // }
+  @Get(':id/trainings')
+  async getChallengeTrainings(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<ResponseTrainingDto[]> {
+    return await this.challengesService.getChallengeTrainings(id);
+  }
 
-  // // POST /challenges
-  // @Post()
-  // createChallenge(@Body() dto: CreateChallengeDto, @Req() req: Request) {
-  //   return this.challengesAuxRepository.createChallenge(dto, req.user);
-  // }
+  @Post()
+  async createChallenge(@Body() dto: CreateChallengeDto, @Req() req: Request): Promise<void> {
+    const user = req.user!;
+    await this.challengesService.createChallenge(dto, user.username);
+  }
 
-  // // PATCH /challenges
-  // @Patch()
-  // updateChallenge(@Body() dto: UpdateChallengeDto, @Req() req: Request) {
-  //   return this.challengesAuxRepository.updateChallenge(dto, req.user);
-  // }
+  @UseGuards(ChallengeOwnerGuard)
+  @Patch('/:id')
+  async updateChallenge(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateChallengeDto,
+    @Req() req: Request,
+  ): Promise<void> {
+    const user = req.user!;
+    await this.challengesService.updateChallenge(id, dto, user.username, user.role);
+  }
 
-  // // PATCH /challenges/:id/enroll
-  // @Patch(':id/enroll')
-  // enrollInChallenge(@Param('id') id: number, @Req() req: Request) {
-  //   return this.challengesAuxRepository.enrollInChallenge(id, req.user!.email);
-  // }
+  @Patch(':id/enroll')
+  async enrollInChallenge(@Param('id') id: number, @Req() req: Request): Promise<void> {
+    const user = req.user!;
+    await this.challengesService.enrollInChallenge(id, user.username);
+  }
 
-  // // DELETE /challenges/:id
-  // @Delete(':id')
-  // deleteChallenge(@Param('id') id: number, @Req() req: Request) {
-  //   return this.challengesAuxRepository.deleteChallenge(id, req.user);
-  // }
+  @UseGuards(ChallengeOwnerGuard)
+  @Delete(':id')
+  async deleteChallenge(@Param('id') id: number): Promise<void> {
+    await this.challengesCrudRepository.delete(id);
+  }
+
+  @Post(':id/completed')
+  async markTodayAsCompleted(@Param('id') challengeId: number, @Req() req: Request): Promise<void> {
+    const user = req.user as { username: string };
+    await this.challengesService.markDayAsCompleted(user.username, challengeId);
+  }
 }

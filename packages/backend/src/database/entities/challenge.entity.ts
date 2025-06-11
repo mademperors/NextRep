@@ -9,8 +9,9 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { ChallengeType } from '../../common/constants/enums/challenge-types.enum';
-import { Member } from './member.entity';
-import { MemberChallenge } from './memberChallenge.entity';
+import { Status } from '../../common/constants/enums/status.enum';
+import { AccountChallenge } from './account-challenge.entity';
+import { Account } from './account.entity';
 import { Training } from './training.entity';
 
 @Entity('challenge')
@@ -19,52 +20,44 @@ export class Challenge {
   id: number;
 
   @Column({ type: 'text', nullable: false })
-  challenge_info: string;
+  challengeInfo: string;
 
   @Column('enum', { enum: ChallengeType, nullable: false })
-  challenge_type: ChallengeType;
+  challengeType: ChallengeType;
 
   @Column({ type: 'integer', nullable: false })
   duration: number;
 
-  @Column({ type: 'integer', nullable: false, default: 1 })
-  current_day: number;
+  @Column({ type: 'integer', nullable: false, default: 0 })
+  currentDay: number;
 
-  @ManyToOne(() => Member, { nullable: false, onDelete: 'RESTRICT' })
+  @Column({ type: 'date', nullable: false })
+  startDate: Date;
+
+  @Column('enum', { enum: Status, nullable: false, default: Status.ENROLLMENT })
+  status: Status;
+
+  @ManyToOne(() => Account, { nullable: false, onDelete: 'RESTRICT' })
   @JoinColumn({ name: 'creator', referencedColumnName: 'username' })
-  creator: Member;
+  creator: Account;
 
   @ManyToMany(() => Training, { cascade: false })
   @JoinTable({
     name: 'challenge_trainings',
     joinColumn: {
-      name: 'challenge_id',
+      name: 'challengeId',
       referencedColumnName: 'id',
     },
     inverseJoinColumn: {
-      name: 'training_id',
+      name: 'trainingId',
       referencedColumnName: 'id',
     },
   })
   trainings: Training[];
 
-  @ManyToMany(() => Member, { cascade: false })
-  @JoinTable({
-    name: 'enrolled',
-    joinColumn: {
-      name: 'challenge_id',
-      referencedColumnName: 'id',
-    },
-    inverseJoinColumn: {
-      name: 'member_username',
-      referencedColumnName: 'username',
-    },
-  })
-  enrolled: Member[];
-
-  @OneToMany(() => MemberChallenge, (enrolled) => enrolled.challenge, {
+  @OneToMany(() => AccountChallenge, (enrolled) => enrolled.challenge, {
     cascade: true,
     onDelete: 'CASCADE',
   })
-  enrolledMembers: MemberChallenge[];
+  enrolled: AccountChallenge[];
 }
