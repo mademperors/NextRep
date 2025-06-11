@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Training } from 'src/database/entities/training.entity';
-import { MembersRepository } from 'src/repositories/accounts/members/member.repository';
+import { AccountRepository } from 'src/repositories/accounts/accounts.repository';
 import { FindManyOptions, FindOneOptions, Repository } from 'typeorm';
 import { ICRUD } from '../../interfaces/icrud.interface';
 import { CreateTrainingDto } from '../dtos/create-training.dto';
@@ -18,7 +18,7 @@ type Param = number;
 export class TrainingsCrudRepository implements ICRUD<Training, Dtos, Param> {
   constructor(
     @InjectRepository(Training) private readonly trainingsRepository: Repository<Training>,
-    private readonly membersRepository: MembersRepository,
+    private readonly accountsRepository: AccountRepository,
   ) {}
 
   async findOne(options: FindOneOptions): Promise<Dtos['ResponseDto']> {
@@ -32,14 +32,12 @@ export class TrainingsCrudRepository implements ICRUD<Training, Dtos, Param> {
   }
 
   async create(createDto: Dtos['CreateDto']): Promise<void> {
-    const creatorMember = await this.membersRepository.findMemberForRelation({
-      username: createDto.creator,
-    });
+    const creator = await this.accountsRepository.findForRelation(createDto.creator);
 
     const trainingEntity = this.trainingsRepository.create({
       title: createDto.title,
       trainingInfo: createDto.trainingInfo,
-      creator: creatorMember,
+      creator,
     });
 
     await this.trainingsRepository.save(trainingEntity);

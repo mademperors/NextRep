@@ -18,8 +18,8 @@ export class AccountRepository {
   ) {}
 
   // Find any account (Member or Admin) by username
-  async findByUsername(username: string): Promise<Account | null> {
-    return await this.accountRepository.findOne({
+  async findByUsername(username: string): Promise<Account> {
+    return await this.accountRepository.findOneOrFail({
       where: { username },
     });
   }
@@ -94,8 +94,8 @@ export class AccountRepository {
 
   async create(username: string, password: string, accountType: Role): Promise<Account> {
     // Check if username already exists
-    const existingAccount = await this.findByUsername(username);
-    if (existingAccount) {
+    const exists = await this.exists(username);
+    if (exists) {
       throw new ConflictException('Username already exists');
     }
 

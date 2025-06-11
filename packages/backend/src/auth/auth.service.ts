@@ -16,8 +16,8 @@ export class AuthService {
 
   async validateLocal(loginDto: AuthDto): Promise<string | null> {
     const foundUser = await this.accountsRepository.getCredentials(loginDto.username);
-    console.log(foundUser);
     if (!foundUser) return null;
+
     if (!comparePasswords(loginDto.password, foundUser.password)) return null;
     if (foundUser.accountType !== loginDto.role) return null;
 

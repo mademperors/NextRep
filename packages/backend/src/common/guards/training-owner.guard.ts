@@ -12,8 +12,6 @@ export class TrainingOwnerGuard implements CanActivate {
     const id = +req.params['id'];
 
     const creatorUsername = await this.trainingService.getTrainingCreatorUsername(id);
-    if (creatorUsername !== user.username) return false;
-
-    return true;
+    return creatorUsername === user.username;
   }
 }

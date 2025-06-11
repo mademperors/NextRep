@@ -1,8 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { plainToInstance } from 'class-transformer';
+import { Role } from 'src/common/constants/enums/roles.enum';
 import { Member } from 'src/database/entities/member.entity';
 import { Training } from 'src/database/entities/training.entity';
+import { AccountRepository } from 'src/repositories/accounts/accounts.repository';
 import { In, Repository } from 'typeorm';
 import { CreateTrainingDto } from '../dtos/create-training.dto';
 import { ResponseTrainingDto } from '../dtos/response-training.dto';
@@ -14,6 +16,7 @@ export class TrainingsService {
   constructor(
     @InjectRepository(Training) private readonly trainingsRepository: Repository<Training>,
     private readonly trainingsCrudRepository: TrainingsCrudRepository,
+    private readonly accountsRepository: AccountRepository,
   ) {}
 
   // --- NEW SERVICE METHODS ---
@@ -31,7 +34,12 @@ export class TrainingsService {
     return this.mapToResponseDto(trainingEntity);
   }
 
-  async createTraining(createDto: CreateTrainingDto): Promise<void> {
+  async createTraining(createDto: CreateTrainingDto, userRole: Role): Promise<void> {
+    const creatorAccount = await this.accountsRepository.findByUsername(createDto.creator);
+    if (creatorAccount.accountType !== userRole) {
+      throw new ForbiddenException('Account type mismatch');
+    }
+
     await this.trainingsCrudRepository.create(createDto);
   }
 
