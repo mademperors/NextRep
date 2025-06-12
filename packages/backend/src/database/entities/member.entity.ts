@@ -1,11 +1,12 @@
-import { Column, Entity, JoinTable, ManyToMany } from 'typeorm';
+import { ChildEntity, Column, JoinTable, ManyToMany } from 'typeorm';
 import { Gender } from '../../common/constants/enums/gender.enum';
 import { Goal } from '../../common/constants/enums/goal.enum';
+import { Role } from '../../common/constants/enums/roles.enum';
+import { Account } from './account.entity';
 import { Achivement } from './achivement.entity';
-import { AuthInfo } from './auth-info.interface';
 
-@Entity('member')
-export class Member extends AuthInfo {
+@ChildEntity(Role.MEMBER)
+export class Member extends Account {
   @Column('decimal', { precision: 4, scale: 1, nullable: true })
   weight?: number;
 
@@ -22,9 +23,13 @@ export class Member extends AuthInfo {
   goal?: Goal;
 
   @Column('text', { nullable: true })
-  additional_info?: string;
+  additionalInfo?: string;
 
   @ManyToMany(() => Achivement, { nullable: true, onDelete: 'NO ACTION' })
   @JoinTable()
   achivements?: Achivement[];
+
+  @ManyToMany(() => Member, { nullable: true, onDelete: 'SET NULL' })
+  @JoinTable()
+  friends?: Member[];
 }

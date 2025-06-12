@@ -28,7 +28,7 @@ export class UpdateMemberDto {
 
   @IsString()
   @IsOptional()
-  additional_info?: string;
+  additionalInfo?: string;
 
   @IsString()
   @IsOptional()

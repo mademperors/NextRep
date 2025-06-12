@@ -1,9 +1,9 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Training } from 'src/database/entities/training.entity';
+import { AccountRepository } from 'src/repositories/accounts/accounts.repository';
 import { FindManyOptions, FindOneOptions, Repository } from 'typeorm';
 import { ICRUD } from '../../interfaces/icrud.interface';
-import { MembersRepository } from '../../members/member.repository';
 import { CreateTrainingDto } from '../dtos/create-training.dto';
 import { UpdateTrainingDto } from '../dtos/update-training.dto';
 
@@ -18,7 +18,7 @@ type Param = number;
 export class TrainingsCrudRepository implements ICRUD<Training, Dtos, Param> {
   constructor(
     @InjectRepository(Training) private readonly trainingsRepository: Repository<Training>,
-    private readonly membersRepository: MembersRepository,
+    private readonly accountsRepository: AccountRepository,
   ) {}
 
   async findOne(options: FindOneOptions): Promise<Dtos['ResponseDto']> {
@@ -32,14 +32,12 @@ export class TrainingsCrudRepository implements ICRUD<Training, Dtos, Param> {
   }
 
   async create(createDto: Dtos['CreateDto']): Promise<void> {
-    const creatorMember = await this.membersRepository.findMemberForRelation({
-      username: createDto.creator,
-    });
+    const creator = await this.accountsRepository.findForRelation(createDto.creator);
 
     const trainingEntity = this.trainingsRepository.create({
       title: createDto.title,
-      training_info: createDto.training_info,
-      creator: creatorMember,
+      trainingInfo: createDto.trainingInfo,
+      creator,
     });
 
     await this.trainingsRepository.save(trainingEntity);
@@ -54,6 +52,6 @@ export class TrainingsCrudRepository implements ICRUD<Training, Dtos, Param> {
 
   async delete(id: Param): Promise<void> {
     const deleted = await this.trainingsRepository.delete({ id });
-    if (deleted.affected === 0) throw new BadRequestException(`Training not found`);
+    if (deleted.affected === 0) throw new NotFoundException(`Training not found`);
   }
 }

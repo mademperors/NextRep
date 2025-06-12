@@ -11,6 +11,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { Request } from 'express';
+import { Role } from 'src/common/constants/enums/roles.enum';
 import { TrainingOwnerGuard } from 'src/common/guards/training-owner.guard';
 import { CreateTrainingDto } from './dtos/create-training.dto';
 import { ResponseTrainingDto } from './dtos/response-training.dto';
@@ -23,8 +24,8 @@ export class TrainingsController {
 
   @Get()
   async getTrainings(@Req() req: Request): Promise<ResponseTrainingDto[]> {
-    const memberUsername: string = req.user!.username;
-    return await this.trainingsService.findTrainings(memberUsername);
+    const user = req.user as { username: string };
+    return await this.trainingsService.findTrainings(user.username);
   }
 
   @UseGuards(TrainingOwnerGuard)
@@ -35,8 +36,9 @@ export class TrainingsController {
 
   @Post()
   async createTraining(@Body() createDto: CreateTrainingDto, @Req() req: Request): Promise<void> {
-    createDto.creator = req.user!.username;
-    await this.trainingsService.createTraining(createDto);
+    const user = req.user as { username: string; role: Role };
+    createDto.creator = user.username;
+    await this.trainingsService.createTraining(createDto, user.role);
   }
 
   @UseGuards(TrainingOwnerGuard)

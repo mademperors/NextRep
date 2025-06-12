@@ -9,5 +9,5 @@ export class CreateTrainingDto {
   creator: string;
 
   @IsString()
-  training_info: string;
+  trainingInfo: string;
 }

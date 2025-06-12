@@ -1,12 +1,12 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { plainToInstance } from 'class-transformer';
 import { encodePassword } from 'src/common/utils/bcrypt';
-import { AuthInfo } from 'src/database/entities/auth-info.interface';
+import { Account } from 'src/database/entities/account.entity';
 import { Member } from 'src/database/entities/member.entity';
+import { IAUTH } from 'src/repositories/interfaces/iauth.interface';
+import { ICRUD } from 'src/repositories/interfaces/icrud.interface';
 import { FindManyOptions, FindOneOptions, FindOptionsWhere, Repository } from 'typeorm';
-import { IAUTH } from '../interfaces/iauth.interface';
-import { ICRUD } from '../interfaces/icrud.interface';
 import { CreateMemberDto } from './dtos/create-member.dto';
 import { ResponseMemberDto } from './dtos/response-member.dto';
 import { UpdateMemberDto } from './dtos/update-member.dto';
@@ -49,10 +49,10 @@ export class MembersRepository implements ICRUD<Member, Dtos, Param>, IAUTH {
 
   async delete(username: Param): Promise<void> {
     const deleted = await this.memberRepository.delete({ username });
-    if (deleted.affected === 0) throw new BadRequestException(`Member not found`);
+    if (deleted.affected === 0) throw new NotFoundException(`Member not found`);
   }
 
-  async getCredentials(username: Param): Promise<AuthInfo | null> {
+  async getCredentials(username: Param): Promise<Account | null> {
     return await this.memberRepository.findOne({
       where: { username },
       select: ['username', 'password'],
@@ -60,16 +60,14 @@ export class MembersRepository implements ICRUD<Member, Dtos, Param>, IAUTH {
   }
 
   async findOneFull(options: FindOptionsWhere<Member>): Promise<Member> {
-    const member = await this.memberRepository.findOneBy(options);
-    if (!member) throw new BadRequestException(`Member not found`);
-
+    const member = await this.memberRepository.findOneByOrFail(options);
     return member;
   }
 
   async findMemberForRelation(options: FindOptionsWhere<Member>): Promise<Member> {
     const member = await this.memberRepository.findOneOrFail({
       where: options,
-      select: ['username', 'weight', 'height', 'gender', 'age', 'goal', 'additional_info'],
+      select: ['username', 'weight', 'height', 'gender', 'age', 'goal', 'additionalInfo'],
     });
 
     return member;

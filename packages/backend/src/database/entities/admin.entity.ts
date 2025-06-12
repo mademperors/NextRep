@@ -1,5 +1,6 @@
-import { Entity } from 'typeorm';
-import { AuthInfo } from './auth-info.interface';
+import { ChildEntity } from 'typeorm';
+import { Role } from '../../common/constants/enums/roles.enum';
+import { Account } from './account.entity';
 
-@Entity('admin')
-export class Admin extends AuthInfo {}
+@ChildEntity(Role.ADMIN)
+export class Admin extends Account {}
