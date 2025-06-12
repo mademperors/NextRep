@@ -2,10 +2,10 @@ import { HumanMessage, SystemMessage } from '@langchain/core/messages';
 import { ChatGoogleGenerativeAI } from '@langchain/google-genai';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { Gender } from 'src/common/constants/enums/gender.enum';
-import { ResponseMemberDto } from '../repositories/members/dtos/response-member.dto';
-import { MembersRepository } from '../repositories/members/member.repository';
 import { ResponseLLMDto } from './dto/responce-llm.dto';
 import { mealRecommendationExamples } from './prompts/meal-recomendation-examples';
+import { MembersRepository } from 'src/repositories/accounts/members/member.repository';
+import { ResponseMemberDto } from 'src/repositories/accounts/members/dtos/response-member.dto';
 
 @Injectable()
 export class LlmModuleService {
