@@ -19,9 +19,6 @@ export class LlmModuleService {
 
   async getRecommendation(username: string): Promise<ResponseLLMDto> {
     const member = await this.memberRepository.findOne({ where: { username } });
-
-    const memberChallenges = []; // TODO: call member_challenge repo method to get challenges of member
-
     const bmr = await this.calculateBMR(member);
 
     const messages = [
@@ -30,8 +27,7 @@ export class LlmModuleService {
       ),
       ...mealRecommendationExamples.map((ex) => [ex.input, ex.output]).flat(),
       new HumanMessage(`User data: ${JSON.stringify(member)}
-      BMR: ${bmr}
-      Current Challenges: ${JSON.stringify(memberChallenges)}`),
+      BMR: ${bmr}`),
     ];
 
     const responce = await this.googleGenerativeModel.invoke(messages);
