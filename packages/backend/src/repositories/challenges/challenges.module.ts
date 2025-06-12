@@ -1,17 +1,21 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AccountChallenge } from 'src/database/entities/account-challenge.entity';
 import { Challenge } from 'src/database/entities/challenge.entity';
-import { MemberChallenge } from 'src/database/entities/memberChallenge.entity';
-import { MembersModule } from '../members/member.module';
+import { AccountsModule } from '../accounts/accounts.module';
 import { TrainingsModule } from '../trainings/training.module';
 import { ChallengesController } from './challenges.controller';
-import { ChallengesAuxRepository } from './services/challenges-aux.repository';
 import { ChallengesCrudRepository } from './services/challenges-crud.repository';
+import { ChallengesService } from './services/challenges.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Challenge, MemberChallenge]), MembersModule, TrainingsModule],
+  imports: [
+    TypeOrmModule.forFeature([Challenge, AccountChallenge]),
+    AccountsModule,
+    TrainingsModule,
+  ],
   controllers: [ChallengesController],
-  providers: [ChallengesAuxRepository, ChallengesCrudRepository],
-  exports: [ChallengesAuxRepository, ChallengesCrudRepository],
+  providers: [ChallengesService, ChallengesCrudRepository],
+  exports: [ChallengesService, ChallengesCrudRepository],
 })
 export class ChallengesModule {}
