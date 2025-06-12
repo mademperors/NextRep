@@ -20,11 +20,11 @@ export default function CreateTrainingPage() {
     mutationFn: (formData: any) =>
       createTraining({
         title: formData.name,
-        training_info: formData.description,
+        trainingInfo: formData.description,
       }),
     onSuccess: () => {
       toast.success('Training created successfully');
-      navigate('/challenges');
+      setFormData({ name: '', description: '' });
     },
     onError: () => {
       toast.error('Failed to create training');

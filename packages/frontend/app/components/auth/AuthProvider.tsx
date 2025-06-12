@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { createContext, useContext } from 'react';
+import { createContext, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import type { Admin } from '~/api/admins';
 import { checkAuth, login as loginApi, logout as logoutApi } from '~/api/auth';
@@ -22,7 +22,11 @@ export const authContext = createContext<{
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { data: user, isLoading } = useQuery({
+  const {
+    data: user,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ['user'],
     queryFn: checkAuth,
   });
@@ -48,6 +52,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       queryClient.invalidateQueries({ queryKey: ['user'] });
     },
   });
+
+  useEffect(() => {
+    if (error && error.cause instanceof Response && error.cause.status === 401) {
+      // navigate('/login');
+    }
+  }, [error, navigate]);
 
   return (
     <authContext.Provider value={{ user: user ?? null, logout, login, isLoading }}>

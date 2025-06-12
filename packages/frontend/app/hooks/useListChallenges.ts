@@ -8,11 +8,10 @@ export const useListChallenges = (
   member: Member,
 ): ListChallenge[] => {
   return originalChallenges.map((challenge) => ({
-    id: challenge.id,
-    name: challenge.name,
-    description: challenge.description,
-    days: challenge.days.length,
-    enrolled: useIsEnrolledInChallenge(challenge.id, member) ?? false,
+    id: challenge.id.toString(),
+    description: challenge.challengeInfo,
+    days: challenge.trainingIds?.length ?? 0,
+    enrolled: useIsEnrolledInChallenge(challenge.id.toString(), member) ?? false,
   }));
 };
 

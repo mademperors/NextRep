@@ -3,12 +3,15 @@
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
 import { Checkbox } from '~/components/ui/checkbox';
 
+export const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] as const;
+type Day = (typeof dayNames)[number];
 interface InteractiveCalendarProps {
   days: boolean[];
   currentDay: number;
   title?: string;
   onDayClick: (day: number) => void;
   enableMissedDays?: boolean;
+  startDay: Day;
 }
 
 export function InteractiveCalendar({
@@ -17,14 +20,14 @@ export function InteractiveCalendar({
   title = 'Calendar',
   enableMissedDays = false,
   onDayClick,
+  startDay,
 }: InteractiveCalendarProps) {
   const getDayName = (index: number) => {
-    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    return days[index % 7];
+    return dayNames[(index + dayNames.indexOf(startDay)) % 7];
   };
 
   return (
-    <Card className="w-full max-w-4xl mx-auto">
+    <Card className="w-full mx-auto">
       <CardHeader>
         <CardTitle className="text-center">{title}</CardTitle>
       </CardHeader>

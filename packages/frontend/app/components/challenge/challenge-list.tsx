@@ -5,7 +5,6 @@ import { Card } from '~/components/ui/card';
 
 interface ListChallenge {
   id: string;
-  name: string;
   description: string;
   days: number;
   enrolled: boolean;
@@ -33,7 +32,7 @@ function ChallengeItem({ challenge }: ChallengeItemProps) {
     >
       <div className="flex-grow">
         <div className="flex justify-between items-start mb-2">
-          <h3 className="text-xl font-semibold">{challenge.name}</h3>
+          <h3 className="text-xl font-semibold">Challenge</h3>
           <Badge variant={challenge.enrolled ? 'default' : 'outline'}>
             {challenge.enrolled ? 'Enrolled' : 'Not Enrolled'}
           </Badge>
