@@ -5,7 +5,7 @@ import { TrainingsModule } from './trainings/training.module';
 import { FriendsModule } from './friends/friends.module';
 
 @Module({
-  imports: [AccountsModule, ChallengesModule, TrainingsModuleб FriendsModule],
+  imports: [AccountsModule, ChallengesModule, TrainingsModule, FriendsModule],
   exports: [AccountsModule],
 })
 export class RepositoryModule {}
