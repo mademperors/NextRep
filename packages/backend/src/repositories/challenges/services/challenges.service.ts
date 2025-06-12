@@ -186,6 +186,7 @@ export class ChallengesService {
       challengeType: challenge.challengeType,
       duration: challenge.duration,
       currentDay: challenge.currentDay,
+      startDate: challenge.startDate.toISOString(),
       creator: challenge.creator.username,
       trainingIds: challenge.trainings ? challenge.trainings.map((training) => training.id) : [],
       enrolledUsernames: challenge.enrolled
@@ -242,3 +243,4 @@ export class ChallengesService {
     return record.completedDays;
   }
 }
+

@@ -10,8 +10,10 @@ export class ResponseChallengeDto {
   challengeType: ChallengeType;
   duration: number;
   currentDay: number;
+  startDate: string;
 
   creator: string;
   trainingIds: number[];
   enrolledUsernames?: string[];
 }
+

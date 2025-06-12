@@ -31,7 +31,7 @@ export class Challenge {
   @Column({ type: 'integer', nullable: false, default: 0 })
   currentDay: number;
 
-  @Column({ type: 'date', nullable: false })
+  @Column({ type: 'timestamptz', nullable: false })
   startDate: Date;
 
   @Column('enum', { enum: Status, nullable: false, default: Status.ENROLLMENT })
@@ -61,3 +61,4 @@ export class Challenge {
   })
   enrolled: AccountChallenge[];
 }
+
