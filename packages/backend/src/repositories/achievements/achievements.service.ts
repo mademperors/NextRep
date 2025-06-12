@@ -3,33 +3,86 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Achivement } from 'src/database/entities/achivement.entity';
 import { Member } from 'src/database/entities/member.entity';
 import { Repository } from 'typeorm';
+import { ChallengesCrudRepository } from '../challenges/services/challenges-crud.repository';
 import { CreateAchievementDto } from './dto/create-achievement.dto';
 import { ResponseAchivementsDto } from './dto/responce-achivements.dto';
 import { UpdateAchievementDto } from './dto/update-achievement.dto';
-import { ChallengesCrudRepository } from '../challenges/services/challenges-crud.repository';
+import { AccountChallenge } from 'src/database/entities/account-challenge.entity';
 
 @Injectable()
 export class AchivementsService {
-
   constructor(
     @InjectRepository(Achivement)
     private readonly achivementRepository: Repository<Achivement>,
     @InjectRepository(Member)
     private readonly memberRepository: Repository<Member>,
-    private readonly challengesRepository: ChallengesCrudRepository, 
+    private readonly challengesRepository: ChallengesCrudRepository,
   ) {}
 
-    async getMyAchievements(username: string) {
-    return this.memberRepository.findOne({
-      where: { username },
-      relations: ['achivements'],
-    }).then(member => {
-      if (!member) throw new BadRequestException('Member not found');
-      return { achivements: member.achivements || [] };
-    });
+  async getMyAchievements(username: string) {
+    return this.memberRepository
+      .findOne({
+        where: { username },
+        relations: ['achivements'],
+      })
+      .then((member) => {
+        if (!member) throw new BadRequestException('Member not found');
+        return { achivements: member.achivements || [] };
+      });
   }
 
-  async getGenericAchievements(username: string) {
+  async getGenericAchievements(username: string): Promise<ResponseAchivementsDto> {
+    // Find the member and their enrolled challenges
+    const member = await this.memberRepository.findOne({
+      where: { username },
+      relations: ['achivements'],
+    });
+    if (!member) throw new BadRequestException('Member not found');
+
+    // Get all AccountChallenge records for this member
+    const accountChallenges = await this.challengesRepository['challengeRepository'].manager.find(
+      'account_challenge',
+      {
+        where: { accountUsername: username },
+      },
+    );
+
+    const achievements: Achivement[] = [];
+
+    // 1. Enrolled in first challenge
+    if (accountChallenges.length > 0) {
+      achievements.push({
+        achievement_id: 0,
+        achievement_info: 'Enrolled in first challenge',
+      } as Achivement);
+    }
+
+    // 2. Completed the first day of any challenge
+    const completedFirstDay = accountChallenges.some(
+      (ac: AccountChallenge) => ac.completedDays && ac.completedDays[0],
+    );
+    if (completedFirstDay) {
+      achievements.push({
+        achievement_id: 0,
+        achievement_info: 'Completed the first day of challenge',
+      } as Achivement);
+    }
+
+    // 3. Completed one challenge (all days true in any challenge)
+    const completedOneChallenge = accountChallenges.some(
+      (ac: any) =>
+        Array.isArray(ac.completedDays) &&
+        ac.completedDays.length > 0 &&
+        ac.completedDays.every((d: boolean) => d),
+    );
+    if (completedOneChallenge) {
+      achievements.push({
+        achievement_id: 0,
+        achievement_info: 'Completed one challenge',
+      } as Achivement);
+    }
+
+    return { achivements: achievements };
   }
 
   async create(createAchivementDto: CreateAchievementDto): Promise<ResponseAchivementsDto> {
