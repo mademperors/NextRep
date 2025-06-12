@@ -1,4 +1,4 @@
-import { ChildEntity, Column } from 'typeorm';
+import { ChildEntity, Column, Entity, JoinTable, ManyToMany } from 'typeorm';
 import { Gender } from '../../common/constants/enums/gender.enum';
 import { Goal } from '../../common/constants/enums/goal.enum';
 import { Role } from '../../common/constants/enums/roles.enum';
@@ -23,4 +23,8 @@ export class Member extends Account {
 
   @Column('text', { nullable: true })
   additionalInfo?: string;
+
+  @ManyToMany(() => Member, { nullable: true, onDelete: 'SET NULL' })
+  @JoinTable()
+  friends?: Member[];
 }
