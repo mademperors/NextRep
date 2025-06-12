@@ -7,7 +7,7 @@ export class ResponseMemberDto {
   gender: string;
   age: number;
   goal: string;
-  additional_info: string;
+  additionalInfo: string;
 
   @Exclude()
   password: string;

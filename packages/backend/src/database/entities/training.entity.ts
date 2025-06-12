@@ -1,7 +1,7 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { Member } from './member.entity';
+import { Account } from './account.entity';
 
-@Entity()
+@Entity('training')
 export class Training {
   @PrimaryGeneratedColumn()
   id: number;
@@ -10,9 +10,9 @@ export class Training {
   title: string;
 
   @Column('text', { nullable: false })
-  training_info: string;
+  trainingInfo: string;
 
-  @ManyToOne(() => Member, { nullable: false, onDelete: 'CASCADE' })
+  @ManyToOne(() => Account, { nullable: false, onDelete: 'CASCADE' })
   @JoinColumn({ name: 'creator', referencedColumnName: 'username' })
-  creator: Member;
+  creator: Account;
 }
