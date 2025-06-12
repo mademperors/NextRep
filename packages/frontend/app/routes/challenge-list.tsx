@@ -1,9 +1,8 @@
-import { useQuery } from '@tanstack/react-query';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router';
-import { getChallenges } from '~/api/challenges';
+import { getCreatedChallenges } from '~/api/challenges';
 import { ChallengeList } from '~/components/challenge/challenge-list';
 import { Button } from '~/components/ui/button';
-import { FullScreenDnaLoader } from '~/components/ui/dna-loader';
 import { useListChallenges } from '~/hooks/useListChallenges';
 import { useMember } from '~/hooks/useMember';
 
@@ -13,15 +12,15 @@ export function meta() {
 
 export default function ChallengeListPage() {
   const navigate = useNavigate();
-  const { data: challenges } = useQuery({
+  const { data: challenges } = useSuspenseQuery({
     queryKey: ['challenges'],
-    queryFn: () => getChallenges(),
+    queryFn: () => getCreatedChallenges(),
   });
 
   const member = useMember();
 
-  if (!challenges || !member) {
-    return <FullScreenDnaLoader />;
+  if (!member) {
+    return <div>You are not authorized to access this page</div>;
   }
 
   const listChallenges = useListChallenges(challenges, member);
