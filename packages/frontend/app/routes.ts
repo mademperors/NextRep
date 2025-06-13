@@ -15,6 +15,7 @@ export default [
       index('routes/challenge-list.tsx'),
       route('create', 'routes/create-challenge.tsx'),
       route(':challengeId', 'routes/single-challenge.tsx'),
+      route(':challengeId/edit', 'routes/edit-challenge.tsx'),
     ]),
 
     ...prefix('trainings', [

@@ -23,3 +23,17 @@ export const getChallengeStatus = (challenge: Challenge) => {
   return ChallengeStatus.ACTIVE;
 };
 
+export const getTomorrowDate = () => {
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  tomorrow.setUTCHours(0, 0, 0, 0);
+  return tomorrow;
+};
+
+export const getTomorrowLocalDate = () => {
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  tomorrow.setHours(0, 0, 0, 0);
+  return tomorrow;
+};
+

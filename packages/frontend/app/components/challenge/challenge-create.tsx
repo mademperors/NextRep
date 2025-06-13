@@ -1,12 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Link, useNavigate } from 'react-router';
-import { toast } from 'sonner';
+import { Link } from 'react-router';
 import { z } from 'zod';
-import { createChallenge } from '~/api/challenges';
 import { getTrainings, type Training } from '~/api/trainings';
 import { ChallengeType } from '~/constants/enums/challenge-type.enum';
 import { Role } from '~/constants/enums/roles.enum';
@@ -19,6 +17,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '../ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { Textarea } from '../ui/textarea';
+import { getTomorrowLocalDate } from './utils';
 
 const createChallengeSchema = z.object({
   length: z
@@ -35,7 +34,7 @@ const createChallengeSchema = z.object({
   visibility: z.nativeEnum(ChallengeType),
   trainingIds: z.array(z.number()),
 });
-type CreateChallenge = z.infer<typeof createChallengeSchema>;
+export type CreateChallenge = z.infer<typeof createChallengeSchema>;
 
 const createChallengeDtoSchema = z.object({
   challengeInfo: z.string().min(1, 'Description is required'),
@@ -46,48 +45,24 @@ const createChallengeDtoSchema = z.object({
 });
 export type CreateChallengeDto = z.infer<typeof createChallengeDtoSchema>;
 
-const getTomorrowDate = () => {
-  const tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  tomorrow.setUTCHours(0, 0, 0, 0);
-  return tomorrow;
-};
+interface CreateChallengeProps {
+  onSubmit: (data: CreateChallenge) => void;
+  initialData?: Omit<CreateChallenge, 'trainingIds'> & {
+    trainingIds: (number | undefined)[];
+  };
+}
 
-const getTomorrowLocalDate = () => {
-  const tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  tomorrow.setHours(0, 0, 0, 0);
-  return tomorrow;
-};
-
-export function CreateChallenge() {
-  const navigate = useNavigate();
+export function CreateChallenge({ onSubmit, initialData }: CreateChallengeProps) {
   const { user } = useAuth();
   const [currentDay, setCurrentDay] = useState(0);
   const { data: trainings } = useSuspenseQuery({
     queryKey: ['trainings'],
     queryFn: () => getTrainings(),
   });
-  const { mutate: createChallengeMutation } = useMutation({
-    mutationFn: (data: CreateChallengeDto) => createChallenge(data),
-    onSuccess: () => {
-      toast.success('Challenge created successfully');
-      navigate('/dashboard');
-    },
-    onError: () => {
-      toast.error('Error creating challenge');
-    },
-  });
 
   const form = useForm<CreateChallenge>({
     resolver: zodResolver(createChallengeSchema),
-    defaultValues: {
-      length: 1,
-      challengeInfo: '',
-      startDate: getTomorrowDate(),
-      visibility: ChallengeType.PRIVATE,
-      trainingIds: [undefined],
-    },
+    defaultValues: initialData,
   });
 
   const { handleSubmit, watch, setValue } = form;
@@ -100,21 +75,6 @@ export function CreateChallenge() {
       ...watchedTrainingIds.slice(0, Math.min(watchedTrainingIds.length, length)),
       ...Array(Math.max(0, length - watchedTrainingIds.length)).fill(undefined),
     ]);
-  };
-
-  const onSubmit = (data: CreateChallenge) => {
-    console.log('Form submitted:', data);
-    if (!data.startDate) {
-      toast.error('Please select a start date');
-      return;
-    }
-    createChallengeMutation({
-      challengeInfo: data.challengeInfo,
-      challengeType: user?.role === Role.ADMIN ? ChallengeType.GLOBAL : data.visibility,
-      creator: user?.username ?? '',
-      startDate: data.startDate.toISOString().split('T')[0],
-      trainingIds: data.trainingIds?.filter((id) => id !== undefined) || [],
-    });
   };
 
   return (

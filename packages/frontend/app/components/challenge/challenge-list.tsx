@@ -1,8 +1,9 @@
-import { Clock } from 'lucide-react';
-import { useNavigate } from 'react-router';
+import { Clock, Edit } from 'lucide-react';
+import { Link, useNavigate } from 'react-router';
 import type { Challenge } from '~/api/challenges';
 import { Badge } from '~/components/ui/badge';
 import { Card } from '~/components/ui/card';
+import { Button } from '../ui/button';
 import { ChallengeStatus } from './challenge';
 
 export interface ListChallenge {
@@ -42,14 +43,19 @@ function ChallengeItem({ challenge, enrolled, status }: ListChallenge) {
   };
 
   return (
-    <Card
-      className="flex flex-row items-center p-6 cursor-pointer"
-      onClick={() => navigate(`/challenges/${challenge.id}`)}
-    >
+    <Card className="flex flex-row items-center p-6 cursor-pointer">
       <div className="flex-grow">
         <div className="flex justify-between items-start mb-2">
-          <h3 className="text-xl font-semibold">Challenge {challenge.id}</h3>
-          <StatusBadge status={status} />
+          <h3 className="text-xl font-semibold">
+            <Link to={`/challenges/${challenge.id}`}>Challenge {challenge.id}</Link>
+          </h3>
+          {status === ChallengeStatus.NOT_STARTED && (
+            <Link to={`/challenges/${challenge.id}/edit`}>
+              <Button variant="outline" size="icon" className="cursor-pointer">
+                <Edit className="h-4 w-4" />
+              </Button>
+            </Link>
+          )}
         </div>
         <p className="text-muted-foreground mb-4">By: {challenge.creator}</p>
         <p className="text-muted-foreground mb-4">{truncateText(challenge.challengeInfo)}</p>
@@ -58,9 +64,12 @@ function ChallengeItem({ challenge, enrolled, status }: ListChallenge) {
             <Clock className="mr-1 h-4 w-4" />
             <span>{challenge.duration} days</span>
           </div>
-          <Badge variant={enrolled ? 'default' : 'outline'}>
-            {enrolled ? 'Enrolled' : 'Not Enrolled'}
-          </Badge>
+          <div className="flex items-center gap-2">
+            <StatusBadge status={status} />
+            <Badge variant={enrolled ? 'default' : 'outline'}>
+              {enrolled ? 'Enrolled' : 'Not Enrolled'}
+            </Badge>
+          </div>
         </div>
       </div>
     </Card>
