@@ -54,6 +54,7 @@ export default function SingleChallenge() {
         description: 'Waiting for the challenge to start',
       });
       queryClient.invalidateQueries({ queryKey: ['user'] });
+      window.location.reload();
     },
   });
   const { mutate: completeDay } = useMutation({
