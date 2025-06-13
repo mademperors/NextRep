@@ -4,16 +4,16 @@ import type { Challenge } from '~/api/challenges';
 import { Badge } from '~/components/ui/badge';
 import { Card } from '~/components/ui/card';
 
-interface ChallengeItemProps {
+export interface ListChallenge {
   challenge: Challenge;
   enrolled: boolean;
 }
 
 interface ChallengeListProps {
-  challenges: ChallengeItemProps[];
+  challenges: ListChallenge[];
 }
 
-function ChallengeItem({ challenge, enrolled }: ChallengeItemProps) {
+function ChallengeItem({ challenge, enrolled }: ListChallenge) {
   const navigate = useNavigate();
   const truncateText = (text: string, maxLength = 100) => {
     if (text.length <= maxLength) return text;
