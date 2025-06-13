@@ -1,8 +1,8 @@
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import 'react-chrome-dino-ts/index.css';
-import { useNavigate } from 'react-router';
-import { getEnrolledChallenges } from '~/api/challenges';
-import { getProfile } from '~/api/members';
+import { useParams } from 'react-router';
+import { getEnrolledChallengesByUsername } from '~/api/challenges';
+import { getMember } from '~/api/members';
 import Profile from '~/components/profile/profile';
 import { InlineDnaLoader } from '~/components/ui/dna-loader';
 import useListChallenges from '~/hooks/useListChallenges';
@@ -13,25 +13,21 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function ProfilePage() {
-  const navigate = useNavigate();
+  const { username } = useParams();
   const {
     data: user,
     isLoading,
     status,
   } = useQuery({
     queryKey: ['profile'],
-    queryFn: getProfile,
+    queryFn: () => getMember(username!),
   });
 
   const { data: enrolledChallenges } = useSuspenseQuery({
-    queryKey: ['enrolledChallenges'],
-    queryFn: () => getEnrolledChallenges(),
+    queryKey: ['enrolledChallenges', username],
+    queryFn: () => getEnrolledChallengesByUsername(username!),
   });
   const listEnrolledChallenges = useListChallenges(enrolledChallenges);
-
-  const onEditProfile = () => {
-    navigate('/profile/edit');
-  };
 
   if (isLoading) {
     return (
@@ -50,11 +46,7 @@ export default function ProfilePage() {
   if (status === 'success') {
     return (
       <div className="flex h-screen w-full items-center justify-center">
-        <Profile
-          user={user}
-          onEditProfile={onEditProfile}
-          enrolledChallenges={listEnrolledChallenges}
-        />
+        <Profile user={user} enrolledChallenges={listEnrolledChallenges} />
       </div>
     );
   }

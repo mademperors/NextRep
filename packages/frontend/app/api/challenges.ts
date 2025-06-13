@@ -67,6 +67,13 @@ export const getEnrolledChallenges = async (): Promise<Challenge[]> => {
   return response.json();
 };
 
+export const getEnrolledChallengesByUsername = async (username: string): Promise<Challenge[]> => {
+  const response = await apiFetch(`/challenges/user/${username}`, {
+    method: 'GET',
+  });
+  return response.json();
+};
+
 // Get a specific challenge by ID
 export const getChallenge = async (challengeId: string | number): Promise<Challenge> => {
   // Mock data for now

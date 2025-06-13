@@ -39,6 +39,13 @@ export class ChallengesController {
     return await this.challengesService.getEnrolledChallenges(username);
   }
 
+  @Get('user/:username')
+  async getEnrolledChallengesByUsername(
+    @Param('username') username: string,
+  ): Promise<ResponseChallengeDto[]> {
+    return await this.challengesService.getEnrolledChallenges(username);
+  }
+
   @Get('global')
   async getGlobalChallenges(): Promise<ResponseChallengeDto[]> {
     return await this.challengesService.getGlobalChallenges();
@@ -104,3 +111,4 @@ export class ChallengesController {
     return await this.challengesService.getCompletedDays(id, user.username);
   }
 }
+

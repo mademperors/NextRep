@@ -44,7 +44,9 @@ export function FriendList({
                 <div className="flex items-center gap-4">
                   <div className="flex-1 space-y-1.5">
                     <div className="flex items-center justify-between">
-                      <h3 className="font-semibold text-lg">{friend.name}</h3>
+                      <h3 className="font-semibold text-lg">
+                        <Link to={`/profile/${friend.id}`}>{friend.name}</Link>
+                      </h3>
                       <Badge variant="outline">{friend.gender}</Badge>
                     </div>
 

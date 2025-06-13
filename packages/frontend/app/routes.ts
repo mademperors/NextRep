@@ -10,7 +10,11 @@ export default [
     route('admin/login', 'routes/admin-login.tsx'),
     route('dashboard', 'routes/dashboard.tsx'),
 
-    ...prefix('profile', [index('routes/profile.tsx'), route('edit', 'routes/edit-profile.tsx')]),
+    ...prefix('profile', [
+      index('routes/profile.tsx'),
+      route('edit', 'routes/edit-profile.tsx'),
+      route(':username', 'routes/profile-friends.tsx'),
+    ]),
 
     ...prefix('challenges', [
       index('routes/challenge-list.tsx'),
