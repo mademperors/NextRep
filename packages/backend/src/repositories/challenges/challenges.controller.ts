@@ -66,7 +66,7 @@ export class ChallengesController {
   @Post()
   async createChallenge(@Body() dto: CreateChallengeDto, @Req() req: Request): Promise<void> {
     const user = req.user!;
-    await this.challengesService.createChallenge(dto, user.username);
+    await this.challengesService.createChallenge({ ...dto, creator: user.username });
   }
 
   @UseGuards(ChallengeOwnerGuard)
