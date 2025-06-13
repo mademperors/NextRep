@@ -16,7 +16,7 @@ export class MigrationsDataSourceConfig extends BasePostgresConfig {
   constructor() {
     super();
     this.entities = [Account, Challenge, AccountChallenge, Member, Training, Admin];
-    this.migrations = ['src/database/migrations/v2/*.ts'];
+    this.migrations = ['src/database/migrations/docker/*.ts'];
     this.migrationsRun = false;
   }
 

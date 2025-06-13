@@ -16,4 +16,4 @@ COPY . .
 
 #RUN yarn migration:run
 
-CMD ["yarn", "start:dev"]
+CMD ["sh", "-c", "yarn migration:run && yarn start:dev"]

@@ -11,14 +11,14 @@ services:
     volumes:
       - pg_data:/var/lib/postgres/data
 
-  frontend:
-    build:
-      context: ./packages/frontend
-      dockerfile: Dockerfile
-    env_file:
-      - ./packages/frontend/.env
-    ports:
-      - '5173:5173'
+  # frontend:
+  #   build:
+  #     context: ./packages/frontend
+  #     dockerfile: Dockerfile
+  #   env_file:
+  #     - ./packages/frontend/.env
+  #   ports:
+  #     - '5173:5173'
 
   backend:
     build:
