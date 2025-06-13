@@ -69,7 +69,7 @@ export default function Dashboard() {
         </Button>
       </div>
 
-      <ChallengeList challenges={currentChallenges} />
+      <ChallengeList challenges={currentChallenges} editEnabled={selectedTab === 'created'} />
     </div>
   );
 }

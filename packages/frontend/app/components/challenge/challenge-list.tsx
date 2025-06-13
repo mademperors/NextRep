@@ -10,10 +10,12 @@ export interface ListChallenge {
   challenge: Challenge;
   enrolled: boolean;
   status: ChallengeStatus;
+  editEnabled?: boolean;
 }
 
 interface ChallengeListProps {
   challenges: ListChallenge[];
+  editEnabled?: boolean;
 }
 
 function StatusBadge({ status }: { status: ChallengeStatus }) {
@@ -35,7 +37,7 @@ function StatusBadge({ status }: { status: ChallengeStatus }) {
   );
 }
 
-function ChallengeItem({ challenge, enrolled, status }: ListChallenge) {
+function ChallengeItem({ challenge, enrolled, status, editEnabled }: ListChallenge) {
   const navigate = useNavigate();
   const truncateText = (text: string, maxLength = 100) => {
     if (text.length <= maxLength) return text;
@@ -51,7 +53,7 @@ function ChallengeItem({ challenge, enrolled, status }: ListChallenge) {
           <h3 className="text-xl font-semibold cursor-pointer">
             <Link to={`/challenges/${challenge.id}`}>Challenge {challenge.id}</Link>
           </h3>
-          {status === ChallengeStatus.NOT_STARTED && (
+          {status === ChallengeStatus.NOT_STARTED && editEnabled && (
             <Link to={`/challenges/${challenge.id}/edit`}>
               <Button variant="outline" size="icon" className="cursor-pointer">
                 <Edit className="h-4 w-4" />
@@ -81,7 +83,7 @@ function ChallengeItem({ challenge, enrolled, status }: ListChallenge) {
   );
 }
 
-export function ChallengeList({ challenges }: ChallengeListProps) {
+export function ChallengeList({ challenges, editEnabled = false }: ChallengeListProps) {
   return (
     <div className="space-y-4">
       {challenges.length === 0 && <p className="text-muted-foreground">No challenges found</p>}
@@ -91,6 +93,7 @@ export function ChallengeList({ challenges }: ChallengeListProps) {
           challenge={challenge.challenge}
           enrolled={challenge.enrolled}
           status={challenge.status}
+          editEnabled={editEnabled}
         />
       ))}
     </div>
