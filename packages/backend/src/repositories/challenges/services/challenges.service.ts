@@ -40,8 +40,7 @@ export class ChallengesService {
     });
     return challenges.map((challenge) => {
       const mappedChallenge = this.mapChallengeToResponseDto(challenge);
-      // Manually delete the property for this specific endpoint's output
-      delete mappedChallenge.enrolledUsernames;
+
       return mappedChallenge;
     });
   }
@@ -213,6 +212,7 @@ export class ChallengesService {
       relations: ['challenge'],
     });
 
+    console.log(accountChallenge);
     const currentDay = accountChallenge.challenge.currentDay;
     if (currentDay <= 0 || currentDay > accountChallenge.challenge.duration) {
       throw new ForbiddenException('Invalid current day for challenge');
