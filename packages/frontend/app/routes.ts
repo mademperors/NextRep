@@ -29,6 +29,8 @@ export default [
     ]),
 
     ...prefix('friends', [index('routes/friends.tsx'), route('add', 'routes/add-friend.tsx')]),
+
+    ...prefix('diet', [index('routes/diet.tsx')]),
   ]),
 ] satisfies RouteConfig;
 
