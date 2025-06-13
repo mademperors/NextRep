@@ -19,12 +19,17 @@ export default function ChallengeTask({
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
         <p className="text-muted-foreground">{taskDescription}</p>
-        {isActive && (
+        {isActive ? (
           <Button className="cursor-pointer" onClick={onCompleteTask}>
             Complete Task
+          </Button>
+        ) : (
+          <Button variant="outline" disabled>
+            You have completed today's task. See you tomorrow!
           </Button>
         )}
       </CardContent>
     </Card>
   );
 }
+

@@ -35,7 +35,7 @@ export function Challenge({
   onEnroll,
   startDate,
 }: ChallengeProps) {
-  const [activeDay, setActiveDay] = useState(currentDay);
+  const [activeDay, setActiveDay] = useState(currentDay < 0 ? 0 : currentDay);
   const progress = (currentDay / days.length) * 100;
   const completedDays = days.filter((day) => day).length;
   const onDayClick = (day: number) => {
@@ -78,7 +78,12 @@ export function Challenge({
 
       {status === ChallengeStatus.NOT_STARTED &&
         (!isEnrolled ? (
-          <Button onClick={onEnroll}>Enroll in Challenge</Button>
+          <div className="flex flex-col gap-2">
+            <p className="text-sm text-muted-foreground">
+              The challenge will start on {startDate.toLocaleDateString()}.
+            </p>
+            <Button onClick={onEnroll}>Enroll in Challenge</Button>
+          </div>
         ) : (
           <p className="text-sm text-muted-foreground">
             You are enrolled in this challenge. The challenge will start on{' '}
