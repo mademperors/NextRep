@@ -55,7 +55,7 @@ export default function ProfilePage() {
 
   if (status === 'success') {
     return (
-      <div className="flex h-screen w-full items-center justify-center">
+      <div className="flex w-full items-center justify-center py-10">
         <Profile
           user={user}
           onEditProfile={onEditProfile}

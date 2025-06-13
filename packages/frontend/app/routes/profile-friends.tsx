@@ -38,14 +38,12 @@ export default function ProfilePage() {
   }
 
   if (status === 'error') {
-    return (
-      <div className="flex h-screen w-full items-center justify-center">Error loading profile</div>
-    );
+    return <div className="flex w-full items-center justify-center">Error loading profile</div>;
   }
 
   if (status === 'success') {
     return (
-      <div className="flex h-screen w-full items-center justify-center">
+      <div className="flex w-full items-center justify-center py-10">
         <Profile user={user} enrolledChallenges={listEnrolledChallenges} />
       </div>
     );
