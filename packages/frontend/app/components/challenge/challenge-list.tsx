@@ -45,10 +45,10 @@ function ChallengeItem({ challenge, enrolled, status }: ListChallenge) {
   const startDate = new Date(challenge.startDate);
 
   return (
-    <Card className="flex flex-row items-center p-6 cursor-pointer">
+    <Card className="flex flex-row items-center p-6">
       <div className="flex-grow">
         <div className="flex justify-between items-start mb-2">
-          <h3 className="text-xl font-semibold">
+          <h3 className="text-xl font-semibold cursor-pointer">
             <Link to={`/challenges/${challenge.id}`}>Challenge {challenge.id}</Link>
           </h3>
           {status === ChallengeStatus.NOT_STARTED && (
