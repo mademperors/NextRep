@@ -1,4 +1,4 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type React from 'react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
@@ -18,6 +18,7 @@ export function LoginForm({
   ...props
 }: React.ComponentPropsWithoutRef<'div'> & { role: Role }) {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const mutation = useMutation({
@@ -33,6 +34,7 @@ export function LoginForm({
     onSuccess: () => {
       toast.success('Logged in successfully');
       navigate('/profile');
+      queryClient.invalidateQueries({ queryKey: ['user'] });
     },
     onError: () => {
       toast.error('Failed to login');
@@ -107,3 +109,4 @@ export function LoginForm({
     </div>
   );
 }
+

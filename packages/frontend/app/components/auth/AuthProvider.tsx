@@ -28,7 +28,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     error,
   } = useQuery({
     queryKey: ['user'],
-    queryFn: checkAuth,
+    queryFn: async () => {
+      try {
+        const user = await checkAuth();
+        if (user) {
+          return user;
+        }
+        return null;
+      } catch (error) {
+        if (
+          error instanceof Error &&
+          error.cause instanceof Response &&
+          error.cause.status === 401
+        ) {
+          navigate('/login');
+        }
+        throw error;
+      }
+    },
   });
 
   const { mutate: logout } = useMutation({
@@ -36,6 +53,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user'] });
       navigate('/');
+      window.location.reload();
     },
   });
   const { mutate: login } = useMutation({
