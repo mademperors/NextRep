@@ -6,6 +6,7 @@ import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { DatabaseModule } from './database/database.module';
 import { RepositoryModule } from './repositories/repository.module';
 import { SchedulerModule } from './scheduler/scheduler.module';
+import { LLMModule } from './llm/llm-module.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { SchedulerModule } from './scheduler/scheduler.module';
     AuthModule,
     RepositoryModule,
     SchedulerModule,
+    LLMModule,
   ],
   providers: [
     {
