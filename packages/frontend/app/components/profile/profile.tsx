@@ -73,12 +73,12 @@ export default function Profile({ user, onEditProfile }: ProfileProps) {
           </p>
         </div>
 
-        {user.additional_info && (
+        {user.additionalInfo && (
           <div className="space-y-2">
             <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
               Additional Information
             </h3>
-            <p className="text-base leading-relaxed">{user.additional_info}</p>
+            <p className="text-base leading-relaxed">{user.additionalInfo}</p>
           </div>
         )}
       </CardContent>

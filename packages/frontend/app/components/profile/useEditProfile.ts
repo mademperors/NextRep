@@ -11,7 +11,7 @@ export const useEditProfile = (initialData: Member) => {
   const [gender, setGender] = useState(initialData.gender ?? Gender.MALE);
   const [height, setHeight] = useState(initialData.height);
   const [fitnessGoal, setFitnessGoal] = useState(initialData.goal ?? FitnessGoal.MAINTAIN_WEIGHT);
-  const [additionalInfo, setAdditionalInfo] = useState(initialData.additional_info);
+  const [additionalInfo, setAdditionalInfo] = useState(initialData.additionalInfo);
 
   return {
     username,

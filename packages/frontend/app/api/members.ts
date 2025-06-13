@@ -10,7 +10,7 @@ const memberSchema = z.object({
   gender: z.nativeEnum(Gender).optional(),
   age: z.number().optional(),
   goal: z.nativeEnum(FitnessGoal).optional(),
-  additional_info: z.string().optional(),
+  additionalInfo: z.string().optional(),
   challenges: z.array(z.string()).optional(),
 });
 export type Member = z.infer<typeof memberSchema>;
@@ -22,7 +22,7 @@ const updateMemberSchema = z.object({
   gender: z.nativeEnum(Gender).optional(),
   age: z.number().optional(),
   goal: z.nativeEnum(FitnessGoal).optional(),
-  additional_info: z.string().optional(),
+  additionalInfo: z.string().optional(),
   password: z.string().optional(),
 });
 export type UpdateMember = z.infer<typeof updateMemberSchema>;

@@ -35,7 +35,7 @@ export default function editProfile({ user, onSave }: EditProfileProps) {
       gender,
       age: 20,
       goal: fitnessGoal,
-      additional_info: additionalInfo,
+      additionalInfo: additionalInfo,
     });
   };
 
