@@ -18,6 +18,7 @@ export const authContext = createContext<{
   login: () => {},
   isLoading: false,
 });
+const ignoreAuthRoutes = ['/login', '/register', '/admin/login', '/admin/register'];
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
@@ -36,6 +37,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
         return null;
       } catch (error) {
+        if (ignoreAuthRoutes.includes(window.location.pathname)) {
+          return null;
+        }
         if (
           error instanceof Error &&
           error.cause instanceof Response &&

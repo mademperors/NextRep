@@ -20,7 +20,7 @@ export default function ChallengeTask({
         <CardTitle>Today's Task</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
-        <p className="text-muted-foreground">{taskDescription}</p>
+        <p className="text-muted-foreground whitespace-pre-line">{taskDescription}</p>
         {isActive && (
           <Button className="cursor-pointer" onClick={onCompleteTask}>
             Complete Task

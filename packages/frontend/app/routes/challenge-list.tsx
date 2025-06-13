@@ -1,6 +1,7 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router';
-import { getCreatedChallenges, getEnrolledChallenges } from '~/api/challenges';
+import { getChallenges, getCreatedChallenges, getEnrolledChallenges } from '~/api/challenges';
+import { ChallengeStatus } from '~/components/challenge/challenge';
 import { ChallengeList } from '~/components/challenge/challenge-list';
 import { Button } from '~/components/ui/button';
 import useListChallenges from '~/hooks/useListChallenges';
@@ -19,19 +20,28 @@ export default function ChallengeListPage() {
     queryKey: ['enrolledChallenges'],
     queryFn: () => getEnrolledChallenges(),
   });
+  const { data: globalChallenges } = useSuspenseQuery({
+    queryKey: ['globalChallenges'],
+    queryFn: () => getChallenges(),
+  });
 
   const listCreatedChallenges = useListChallenges(createdChallenges);
   const listEnrolledChallenges = useListChallenges(enrolledChallenges);
+  const listGlobalChallenges = useListChallenges(globalChallenges);
+
+  const avaiableChallenges = [...listCreatedChallenges, ...listGlobalChallenges].filter(
+    (challenge) => challenge.status === ChallengeStatus.NOT_STARTED,
+  );
 
   return (
     <div className="flex flex-col gap-4 py-4 px-8">
       <div className="flex flex-row justify-between items-center">
-        <h1 className="text-2xl font-bold">Created Challenges</h1>
+        <h1 className="text-2xl font-bold">Available Challenges</h1>
         <Button className="cursor-pointer" onClick={() => navigate('/challenges/create')}>
           Create Challenge
         </Button>
       </div>
-      <ChallengeList challenges={listCreatedChallenges} />
+      <ChallengeList challenges={avaiableChallenges} />
       <div className="flex flex-row justify-between items-center">
         <h1 className="text-2xl font-bold">Enrolled Challenges</h1>
       </div>

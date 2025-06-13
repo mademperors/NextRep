@@ -13,7 +13,11 @@ export function Navigation() {
         </NavLink>
         {!isLoading && (
           <>
-            {user && user.role === Role.ADMIN && <></>}
+            {user && user.role === Role.ADMIN && (
+              <>
+                <NavLink to="/challenges/create">Create Challenge</NavLink>
+              </>
+            )}
             {user && user.role === Role.MEMBER && (
               <>
                 <NavLink to="/challenges">Challenges</NavLink>

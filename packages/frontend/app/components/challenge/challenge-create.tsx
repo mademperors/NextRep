@@ -9,6 +9,7 @@ import { z } from 'zod';
 import { createChallenge } from '~/api/challenges';
 import { getTrainings, type Training } from '~/api/trainings';
 import { ChallengeType } from '~/constants/enums/challenge-type.enum';
+import { Role } from '~/constants/enums/roles.enum';
 import { useAuth } from '../auth/AuthProvider';
 import { dayNames, InteractiveCalendar } from '../interactive-calendar';
 import { Button } from '../ui/button';
@@ -109,7 +110,7 @@ export function CreateChallenge() {
     }
     createChallengeMutation({
       challengeInfo: data.challengeInfo,
-      challengeType: data.visibility,
+      challengeType: user?.role === Role.ADMIN ? ChallengeType.GLOBAL : data.visibility,
       creator: user?.username ?? '',
       startDate: data.startDate.toISOString().split('T')[0],
       trainingIds: data.trainingIds?.filter((id) => id !== undefined) || [],
@@ -183,27 +184,29 @@ export function CreateChallenge() {
                   )}
                 />
 
-                <FormField
-                  control={form.control}
-                  name="visibility"
-                  render={({ field }) => (
-                    <FormItem className="w-full">
-                      <FormLabel>Visibility *</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Select visibility" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value={ChallengeType.PRIVATE}>Private</SelectItem>
-                          <SelectItem value={ChallengeType.GROUP}>Group</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                {user?.role === Role.MEMBER && (
+                  <FormField
+                    control={form.control}
+                    name="visibility"
+                    render={({ field }) => (
+                      <FormItem className="w-full">
+                        <FormLabel>Visibility *</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger className="w-full">
+                              <SelectValue placeholder="Select visibility" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value={ChallengeType.PRIVATE}>Private</SelectItem>
+                            <SelectItem value={ChallengeType.GROUP}>Group</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
               </div>
             </CardContent>
           </Card>
