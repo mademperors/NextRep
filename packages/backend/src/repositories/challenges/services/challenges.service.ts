@@ -213,7 +213,7 @@ export class ChallengesService {
     });
 
     const currentDay = accountChallenge.challenge.currentDay;
-    if (currentDay <= 0 || currentDay > accountChallenge.challenge.duration) {
+    if (currentDay < 0 || currentDay > accountChallenge.challenge.duration) {
       throw new ForbiddenException('Invalid current day for challenge');
     }
 
@@ -242,3 +242,4 @@ export class ChallengesService {
     return record.completedDays;
   }
 }
+
