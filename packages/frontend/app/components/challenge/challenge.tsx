@@ -69,6 +69,7 @@ export function Challenge({
       {[ChallengeStatus.ACTIVE, ChallengeStatus.NOT_STARTED].includes(status) ? (
         <ChallengeTask
           isActive={status === ChallengeStatus.ACTIVE && !days[activeDay] && isEnrolled}
+          isCompleted={days[activeDay] && status === ChallengeStatus.ACTIVE}
           taskDescription={dayDescriptions[activeDay]}
           onCompleteTask={onCompleteDay}
         />
