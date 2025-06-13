@@ -72,7 +72,7 @@ export function CreateChallenge() {
     mutationFn: (data: CreateChallengeDto) => createChallenge(data),
     onSuccess: () => {
       toast.success('Challenge created successfully');
-      navigate('/challenges');
+      navigate('/dashboard');
     },
     onError: () => {
       toast.error('Error creating challenge');

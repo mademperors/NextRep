@@ -7,6 +7,7 @@ export default [
     route('register', 'routes/register.tsx'),
     route('admin/register', 'routes/admin-register.tsx'),
     route('admin/login', 'routes/admin-login.tsx'),
+    route('dashboard', 'routes/dashboard.tsx'),
 
     ...prefix('profile', [index('routes/profile.tsx'), route('edit', 'routes/edit-profile.tsx')]),
 

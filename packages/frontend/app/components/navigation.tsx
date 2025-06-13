@@ -20,6 +20,7 @@ export function Navigation() {
             )}
             {user && user.role === Role.MEMBER && (
               <>
+                <NavLink to="/dashboard">Dashboard</NavLink>
                 <NavLink to="/challenges">Challenges</NavLink>
                 <NavLink to="/profile">Profile</NavLink>
               </>
