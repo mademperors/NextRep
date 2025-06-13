@@ -1,6 +1,6 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router';
-import { getChallenges, getCreatedChallenges, getEnrolledChallenges } from '~/api/challenges';
+import { getChallenges, getCreatedChallenges } from '~/api/challenges';
 import { ChallengeStatus } from '~/components/challenge/challenge';
 import { ChallengeList } from '~/components/challenge/challenge-list';
 import { Button } from '~/components/ui/button';
@@ -16,17 +16,12 @@ export default function ChallengeListPage() {
     queryKey: ['createdChallenges'],
     queryFn: () => getCreatedChallenges(),
   });
-  const { data: enrolledChallenges } = useSuspenseQuery({
-    queryKey: ['enrolledChallenges'],
-    queryFn: () => getEnrolledChallenges(),
-  });
   const { data: globalChallenges } = useSuspenseQuery({
     queryKey: ['globalChallenges'],
     queryFn: () => getChallenges(),
   });
 
   const listCreatedChallenges = useListChallenges(createdChallenges);
-  const listEnrolledChallenges = useListChallenges(enrolledChallenges);
   const listGlobalChallenges = useListChallenges(globalChallenges);
 
   const avaiableChallenges = [...listGlobalChallenges, ...listCreatedChallenges].filter(
@@ -42,10 +37,6 @@ export default function ChallengeListPage() {
         </Button>
       </div>
       <ChallengeList challenges={avaiableChallenges} />
-      <div className="flex flex-row justify-between items-center">
-        <h1 className="text-2xl font-bold">Enrolled Challenges</h1>
-      </div>
-      <ChallengeList challenges={listEnrolledChallenges} />
     </div>
   );
 }

@@ -84,6 +84,7 @@ function ChallengeItem({ challenge, enrolled, status }: ListChallenge) {
 export function ChallengeList({ challenges }: ChallengeListProps) {
   return (
     <div className="space-y-4">
+      {challenges.length === 0 && <p className="text-muted-foreground">No challenges found</p>}
       {challenges.map((challenge) => (
         <ChallengeItem
           key={challenge.challenge.id}
