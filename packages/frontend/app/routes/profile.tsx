@@ -1,6 +1,7 @@
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import 'react-chrome-dino-ts/index.css';
 import { useNavigate } from 'react-router';
+import { getMyAchievements } from '~/api/achievements';
 import { getEnrolledChallenges } from '~/api/challenges';
 import { getProfile } from '~/api/members';
 import Profile from '~/components/profile/profile';
@@ -29,6 +30,11 @@ export default function ProfilePage() {
   });
   const listEnrolledChallenges = useListChallenges(enrolledChallenges);
 
+  const { data: achievements } = useSuspenseQuery({
+    queryKey: ['achievements'],
+    queryFn: () => getMyAchievements(),
+  });
+
   const onEditProfile = () => {
     navigate('/profile/edit');
   };
@@ -54,6 +60,7 @@ export default function ProfilePage() {
           user={user}
           onEditProfile={onEditProfile}
           enrolledChallenges={listEnrolledChallenges}
+          achievements={achievements.achivements}
         />
       </div>
     );

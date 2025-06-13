@@ -1,3 +1,4 @@
+import type { Achievement } from '~/api/achievements';
 import type { Member } from '~/api/members';
 import { ChallengeList } from '~/components/challenge/challenge-list';
 import { Button } from '~/components/ui/button';
@@ -9,9 +10,15 @@ interface ProfileProps {
   user: Member;
   onEditProfile?: () => void;
   enrolledChallenges: ListChallenge[];
+  achievements?: Achievement[];
 }
 
-export default function Profile({ user, onEditProfile, enrolledChallenges }: ProfileProps) {
+export default function Profile({
+  user,
+  onEditProfile,
+  enrolledChallenges,
+  achievements,
+}: ProfileProps) {
   const formatHeight = (height: number | undefined) => {
     return height ? `${height} cm` : 'Not specified';
   };
@@ -89,6 +96,24 @@ export default function Profile({ user, onEditProfile, enrolledChallenges }: Pro
           )}
         </CardContent>
       </Card>
+
+      {achievements && achievements.length > 0 && (
+        <>
+          <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+            Achievements
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {achievements.map((achievement) => (
+              <Card key={achievement.achievement_id} className="p-2 px-4 w-fit">
+                <CardContent className="p-0">
+                  <p className="text-base font-medium">{achievement.achievement_info}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </>
+      )}
+
       <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
         Enrolled Challenges
       </h3>
