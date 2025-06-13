@@ -48,7 +48,7 @@ export type CreateChallengeDto = z.infer<typeof createChallengeDtoSchema>;
 const getTomorrowDate = () => {
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
-  tomorrow.setHours(0, 0, 0, 0);
+  tomorrow.setUTCHours(0, 0, 0, 0);
   return tomorrow;
 };
 

@@ -3,8 +3,7 @@ import { useNavigate } from 'react-router';
 import { getCreatedChallenges } from '~/api/challenges';
 import { ChallengeList } from '~/components/challenge/challenge-list';
 import { Button } from '~/components/ui/button';
-import { useListChallenges } from '~/hooks/useListChallenges';
-import { useMember } from '~/hooks/useMember';
+import useIsEnrolledInChallenges from '~/hooks/useIsEnrolledInChallenges';
 
 export function meta() {
   return [{ title: 'Challenge List' }, { name: 'description', content: 'Challenge List' }];
@@ -17,13 +16,12 @@ export default function ChallengeListPage() {
     queryFn: () => getCreatedChallenges(),
   });
 
-  const member = useMember();
+  const isEnrolled = useIsEnrolledInChallenges(challenges);
 
-  if (!member) {
-    return <div>You are not authorized to access this page</div>;
-  }
-
-  const listChallenges = useListChallenges(challenges, member);
+  const listChallenges = challenges.map((challenge, index) => ({
+    challenge,
+    enrolled: isEnrolled[index],
+  }));
 
   return (
     <div className="flex flex-col gap-4 py-4 px-8">

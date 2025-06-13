@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { InteractiveCalendar } from '../interactive-calendar';
+import { dayNames, InteractiveCalendar } from '../interactive-calendar';
 import ProgressBar from '../progress-bar';
 import { Button } from '../ui/button';
 import ChallengeTask from './challenge-task';
@@ -20,6 +20,7 @@ interface ChallengeProps {
   onCompleteDay: () => void;
   isEnrolled: boolean;
   onEnroll: () => void;
+  startDate: Date;
 }
 
 export function Challenge({
@@ -32,6 +33,7 @@ export function Challenge({
   onCompleteDay,
   isEnrolled,
   onEnroll,
+  startDate,
 }: ChallengeProps) {
   const [activeDay, setActiveDay] = useState(currentDay);
   const progress = (currentDay / days.length) * 100;
@@ -61,16 +63,17 @@ export function Challenge({
         currentDay={activeDay}
         onDayClick={onDayClick}
         enableMissedDays={status !== ChallengeStatus.NOT_STARTED}
+        startDay={dayNames[startDate.getDay()]}
       />
 
       {[ChallengeStatus.ACTIVE, ChallengeStatus.NOT_STARTED].includes(status) ? (
         <ChallengeTask
-          isActive={status === ChallengeStatus.ACTIVE && !days[activeDay]}
+          isActive={status === ChallengeStatus.ACTIVE && !days[activeDay] && isEnrolled}
           taskDescription={dayDescriptions[activeDay]}
           onCompleteTask={onCompleteDay}
         />
       ) : (
-        <p className="text-sm text-muted-foreground">You have completed this challenge.</p>
+        <p className="text-sm text-muted-foreground">This challenge is over.</p>
       )}
 
       {status === ChallengeStatus.NOT_STARTED &&
@@ -78,7 +81,8 @@ export function Challenge({
           <Button onClick={onEnroll}>Enroll in Challenge</Button>
         ) : (
           <p className="text-sm text-muted-foreground">
-            You are enrolled in this challenge. The challenge will start soon.
+            You are enrolled in this challenge. The challenge will start on{' '}
+            {startDate.toLocaleDateString()}. See you there!
           </p>
         ))}
     </div>

@@ -1,11 +1,16 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { useParams } from 'react-router';
 import { toast } from 'sonner';
-import { enrollInChallenge, getChallenge } from '~/api/challenges';
-import { useAuth } from '~/components/auth/AuthProvider';
-import { Challenge, ChallengeStatus } from '~/components/challenge/challenge';
-import { FullScreenDnaLoader } from '~/components/ui/dna-loader';
-import { Role } from '~/constants/enums/roles.enum';
+import {
+  enrollInChallenge,
+  getChallenge,
+  getChallengeProgress,
+  getChallengeTrainings,
+  markTodayAsCompleted,
+} from '~/api/challenges';
+import { Challenge } from '~/components/challenge/challenge';
+import { getChallengeStatus, getDayDescriptions } from '~/components/challenge/utils';
+import useIsEnrolledInChallenge from '~/hooks/useIsEnrolledInChallenge';
 import type { Route } from './+types/single-challenge';
 
 export function meta({ params }: Route.MetaArgs) {
@@ -17,46 +22,65 @@ export function meta({ params }: Route.MetaArgs) {
 
 export default function SingleChallenge() {
   const { challengeId } = useParams();
-  const { user } = useAuth();
-  const { data: challenge, status } = useQuery({
+  const queryClient = useQueryClient();
+  const { data: challenge } = useSuspenseQuery({
     queryKey: ['challenge', challengeId],
     queryFn: () => getChallenge(challengeId!),
   });
+  const { data: trainings } = useSuspenseQuery({
+    queryKey: ['trainings', challengeId],
+    queryFn: () => getChallengeTrainings(challengeId!),
+  });
+  const isEnrolled = useIsEnrolledInChallenge(challenge);
+  const { data: completedDays } = useSuspenseQuery({
+    queryKey: ['completedDays', challengeId, isEnrolled],
+    queryFn: () => {
+      if (isEnrolled) {
+        return getChallengeProgress(challengeId!);
+      }
+
+      return Array(challenge.duration).fill(false);
+    },
+  });
+
   const { mutate: enroll } = useMutation({
-    mutationFn: () => enrollInChallenge(challengeId!, user!.username),
+    mutationFn: () => enrollInChallenge(challengeId!),
     onError: (error) => {
       console.error(error);
       toast.error('Failed to enroll in challenge');
     },
+    onSuccess: () => {
+      toast.success('Enrolled in challenge!', {
+        description: 'Waiting for the challenge to start',
+      });
+      queryClient.invalidateQueries({ queryKey: ['user'] });
+    },
+  });
+  const { mutate: completeDay } = useMutation({
+    mutationFn: () => markTodayAsCompleted(challengeId!),
+    onError: (error) => {
+      console.error(error);
+      toast.error('Failed to complete day');
+    },
+    onSuccess: () => {
+      toast.success('Day completed!');
+      queryClient.invalidateQueries({ queryKey: ['completedDays', challengeId, isEnrolled] });
+    },
   });
 
-  const getCurrentDay = () => {
-    if (challenge?.status === ChallengeStatus.COMPLETED) {
-      return challenge.days.length;
-    }
-    return challenge?.currentDay || 0;
-  };
-
-  if (status === 'success') {
-    return (
-      <Challenge
-        days={challenge.days}
-        currentDay={getCurrentDay()}
-        status={challenge.status}
-        title={challenge.name}
-        description={challenge.description}
-        dayDescriptions={challenge.tasks}
-        onCompleteDay={() => {}}
-        isEnrolled={
-          (user?.role === Role.MEMBER &&
-            user?.challenges?.some((challenge) => challenge === challengeId)) ||
-          false
-        }
-        onEnroll={() => {}}
-      />
-    );
-  }
-
-  return <FullScreenDnaLoader />;
+  return (
+    <Challenge
+      days={completedDays}
+      currentDay={challenge.currentDay - 1}
+      status={getChallengeStatus(challenge)}
+      title={`Challenge ${challenge.id}`}
+      description={challenge.challengeInfo}
+      dayDescriptions={getDayDescriptions(challenge, trainings)}
+      onCompleteDay={completeDay}
+      isEnrolled={isEnrolled}
+      onEnroll={enroll}
+      startDate={new Date(challenge.startDate)}
+    />
+  );
 }
 

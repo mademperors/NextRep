@@ -1,24 +1,19 @@
 import { Clock } from 'lucide-react';
 import { useNavigate } from 'react-router';
+import type { Challenge } from '~/api/challenges';
 import { Badge } from '~/components/ui/badge';
 import { Card } from '~/components/ui/card';
 
-interface ListChallenge {
-  id: string;
-  description: string;
-  days: number;
+interface ChallengeItemProps {
+  challenge: Challenge;
   enrolled: boolean;
 }
 
-interface ChallengeItemProps {
-  challenge: ListChallenge;
-}
-
 interface ChallengeListProps {
-  challenges: ListChallenge[];
+  challenges: ChallengeItemProps[];
 }
 
-function ChallengeItem({ challenge }: ChallengeItemProps) {
+function ChallengeItem({ challenge, enrolled }: ChallengeItemProps) {
   const navigate = useNavigate();
   const truncateText = (text: string, maxLength = 100) => {
     if (text.length <= maxLength) return text;
@@ -32,16 +27,17 @@ function ChallengeItem({ challenge }: ChallengeItemProps) {
     >
       <div className="flex-grow">
         <div className="flex justify-between items-start mb-2">
-          <h3 className="text-xl font-semibold">Challenge</h3>
-          <Badge variant={challenge.enrolled ? 'default' : 'outline'}>
-            {challenge.enrolled ? 'Enrolled' : 'Not Enrolled'}
+          <h3 className="text-xl font-semibold">Challenge {challenge.id}</h3>
+          <Badge variant={enrolled ? 'default' : 'outline'}>
+            {enrolled ? 'Enrolled' : 'Not Enrolled'}
           </Badge>
         </div>
-        <p className="text-muted-foreground mb-4">{truncateText(challenge.description)}</p>
+        <p className="text-muted-foreground mb-4">By: {challenge.creator}</p>
+        <p className="text-muted-foreground mb-4">{truncateText(challenge.challengeInfo)}</p>
         <div className="flex justify-between items-center">
           <div className="flex items-center text-sm text-muted-foreground">
             <Clock className="mr-1 h-4 w-4" />
-            <span>{challenge.days} days</span>
+            <span>{challenge.duration} days</span>
           </div>
         </div>
       </div>
@@ -53,11 +49,15 @@ export function ChallengeList({ challenges }: ChallengeListProps) {
   return (
     <div className="space-y-4">
       {challenges.map((challenge) => (
-        <ChallengeItem key={challenge.id} challenge={challenge} />
+        <ChallengeItem
+          key={challenge.challenge.id}
+          challenge={challenge.challenge}
+          enrolled={challenge.enrolled}
+        />
       ))}
     </div>
   );
 }
 
-export type { ChallengeListProps, ListChallenge };
+export type { ChallengeListProps };
 

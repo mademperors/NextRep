@@ -10,6 +10,7 @@ const challengeResponseSchema = z.object({
   challengeType: z.nativeEnum(ChallengeType),
   duration: z.number(),
   currentDay: z.number(),
+  startDate: z.string(),
   creator: z.string(),
   trainingIds: z.array(z.number()).min(1),
   enrolledUsernames: z.array(z.string()).optional(),
@@ -33,56 +34,16 @@ const updateChallengeSchema = z.object({
   trainingIds: z.array(z.number()).min(1).optional(),
 });
 
+const challengeProgressResponseSchema = z.array(z.boolean());
+
 export type Challenge = z.infer<typeof challengeResponseSchema>;
 export type PublicMember = z.infer<typeof publicMemberResponseSchema>;
 export type Training = z.infer<typeof trainingResponseSchema>;
 export type UpdateChallengeDto = z.infer<typeof updateChallengeSchema>;
-
-// const challenge1 = {
-//   id: '1',
-//   name: 'Bicep curl challenge',
-//   description:
-//     'This is a challenge to help you stay on track with your goals. You will be able to complete tasks and earn points. You will also be able to see your progress and your ranking. You will also be able to see your friends progress and their ranking. Also, you will be able to see your friends and their progress.',
-//   days: [true, false, false, true, true, false, false, false, false, false],
-//   tasks: [
-//     '100 pushups',
-//     '100 situps',
-//     '100 squats',
-//     '100 burpees',
-//     '100 lunges',
-//     '100 planks',
-//     '100 pushups',
-//     '100 situps',
-//     '100 squats',
-//     '100 burpees',
-//     '100 lunges',
-//     '100 planks',
-//   ],
-//   currentDay: 5,
-//   status: ChallengeStatus.ACTIVE,
-// };
-// const mockChallenges: Challenge[] = [
-//   challenge1,
-//   {
-//     ...challenge1,
-//     id: '2',
-//     name: 'Pushup challenge',
-//     description:
-//       'This is a push up challenge. Also, you will be able to see your friends and their progress.',
-//   },
-//   {
-//     ...challenge1,
-//     id: '3',
-//     name: 'Situp challenge',
-//     description:
-//       'This is a situp challenge. Also, you will be able to see your friends and their progress.',
-//   },
-// ];
+export type ChallengeProgress = z.infer<typeof challengeProgressResponseSchema>;
 
 // Get all global challenges
 export const getChallenges = async (): Promise<Challenge[]> => {
-  // await new Promise((resolve) => setTimeout(resolve, 1000));
-  // return Promise.resolve(mockChallenges);
   const response = await apiFetch('/challenges/global', {
     method: 'GET',
   });
@@ -107,7 +68,7 @@ export const getEnrolledChallenges = async (): Promise<Challenge[]> => {
 };
 
 // Get a specific challenge by ID
-export const getChallenge = async (challengeId: string | number) => {
+export const getChallenge = async (challengeId: string | number): Promise<Challenge> => {
   // Mock data for now
   // console.log('getChallenge', challengeId);
   // return Promise.resolve(challenge1);
@@ -191,7 +152,9 @@ export const markTodayAsCompleted = async (challengeId: string | number) => {
 };
 
 // Get challenge progress for the current user
-export const getChallengeProgress = async (challengeId: string | number) => {
+export const getChallengeProgress = async (
+  challengeId: string | number,
+): Promise<ChallengeProgress> => {
   const response = await apiFetch(`/challenges/${challengeId}/progress`, {
     method: 'GET',
   });
