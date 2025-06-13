@@ -5,6 +5,10 @@ export function meta() {
 }
 
 export default function CreateChallengePage() {
-  return <CreateChallenge />;
+  return (
+    <div className="flex flex-col gap-4 py-4 px-8">
+      <CreateChallenge />
+    </div>
+  );
 }
 
