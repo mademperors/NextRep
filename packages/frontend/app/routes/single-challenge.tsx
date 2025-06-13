@@ -74,6 +74,7 @@ export default function SingleChallenge() {
       currentDay={challenge.currentDay - 1}
       status={getChallengeStatus(challenge)}
       title={`Challenge ${challenge.id}`}
+      type={challenge.challengeType}
       description={challenge.challengeInfo}
       dayDescriptions={getDayDescriptions(challenge, trainings)}
       onCompleteDay={completeDay}

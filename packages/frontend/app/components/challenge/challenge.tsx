@@ -1,4 +1,7 @@
+import { Share2 } from 'lucide-react';
 import { useState } from 'react';
+import { toast } from 'sonner';
+import { ChallengeType } from '~/constants/enums/challenge-type.enum';
 import { dayNames, InteractiveCalendar } from '../interactive-calendar';
 import ProgressBar from '../progress-bar';
 import { Button } from '../ui/button';
@@ -14,6 +17,7 @@ interface ChallengeProps {
   days: boolean[];
   currentDay: number;
   status: ChallengeStatus;
+  type: ChallengeType;
   title: string;
   description: string;
   dayDescriptions: string[];
@@ -28,6 +32,7 @@ export function Challenge({
   currentDay,
   status,
   title,
+  type,
   description,
   dayDescriptions,
   onCompleteDay,
@@ -44,8 +49,27 @@ export function Challenge({
     }
   };
 
+  const handleShare = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      toast.success('Challenge URL copied to clipboard');
+    } catch (err) {
+      console.error('Failed to copy URL to clipboard:', err);
+    }
+  };
+
   return (
-    <div className="flex flex-col gap-4 py-4 max-w-4xl mx-auto">
+    <div className="flex flex-col gap-4 py-4 max-w-4xl mx-auto relative">
+      {type === ChallengeType.GROUP && (
+        <Button
+          onClick={handleShare}
+          variant="outline"
+          size="sm"
+          className="absolute top-4 right-4 z-10 cursor-pointer"
+        >
+          <Share2 className="h-4 w-4" />
+        </Button>
+      )}
       <div className="flex flex-col items-center gap-2">
         <h1 className="text-2xl font-bold text-center">{title}</h1>
         <p className="text-sm text-muted-foreground text-center">{description}</p>
