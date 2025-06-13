@@ -7,6 +7,7 @@ import { Challenge } from '../entities/challenge.entity';
 import { Member } from '../entities/member.entity';
 import { Training } from '../entities/training.entity';
 import { BasePostgresConfig } from './base-postgres.config';
+import { Achivement } from '../entities/achivement.entity';
 
 export class MigrationsDataSourceConfig extends BasePostgresConfig {
   readonly entities: DataSourceOptions['entities'];
@@ -15,7 +16,7 @@ export class MigrationsDataSourceConfig extends BasePostgresConfig {
 
   constructor() {
     super();
-    this.entities = [Account, Challenge, AccountChallenge, Member, Training, Admin];
+    this.entities = [Account, Challenge, AccountChallenge, Member, Training, Admin, Achivement];
     this.migrations = ['src/database/migrations/v2/*.ts'];
     this.migrationsRun = false;
   }
