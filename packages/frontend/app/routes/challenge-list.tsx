@@ -29,8 +29,8 @@ export default function ChallengeListPage() {
   const listEnrolledChallenges = useListChallenges(enrolledChallenges);
   const listGlobalChallenges = useListChallenges(globalChallenges);
 
-  const avaiableChallenges = [...listCreatedChallenges, ...listGlobalChallenges].filter(
-    (challenge) => challenge.status === ChallengeStatus.NOT_STARTED,
+  const avaiableChallenges = [...listGlobalChallenges, ...listCreatedChallenges].filter(
+    (challenge) => challenge.status === ChallengeStatus.NOT_STARTED && !challenge.enrolled,
   );
 
   return (

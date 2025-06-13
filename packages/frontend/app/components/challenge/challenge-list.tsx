@@ -42,6 +42,8 @@ function ChallengeItem({ challenge, enrolled, status }: ListChallenge) {
     return text.substring(0, maxLength) + '...';
   };
 
+  const startDate = new Date(challenge.startDate);
+
   return (
     <Card className="flex flex-row items-center p-6 cursor-pointer">
       <div className="flex-grow">
@@ -57,8 +59,11 @@ function ChallengeItem({ challenge, enrolled, status }: ListChallenge) {
             </Link>
           )}
         </div>
-        <p className="text-muted-foreground mb-4">By: {challenge.creator}</p>
-        <p className="text-muted-foreground mb-4">{truncateText(challenge.challengeInfo)}</p>
+        {status === ChallengeStatus.NOT_STARTED && (
+          <p className="text-muted-foreground mb-2">Starts on {startDate.toLocaleDateString()}</p>
+        )}
+        <p className="text-muted-foreground mb-2">By: {challenge.creator}</p>
+        <p className="text-muted-foreground mb-2">{truncateText(challenge.challengeInfo)}</p>
         <div className="flex justify-between items-center">
           <div className="flex items-center text-sm text-muted-foreground">
             <Clock className="mr-1 h-4 w-4" />
