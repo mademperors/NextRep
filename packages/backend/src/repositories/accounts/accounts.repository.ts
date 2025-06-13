@@ -65,7 +65,7 @@ export class AccountRepository {
     }
 
     if (account.accountType === Role.MEMBER) {
-      return challengeType === ChallengeType.PRIVATE;
+      return challengeType === ChallengeType.PRIVATE || challengeType === ChallengeType.GROUP;
     }
 
     return false;
@@ -135,3 +135,4 @@ export class AccountRepository {
     return await this.accountRepository.save(account);
   }
 }
+
