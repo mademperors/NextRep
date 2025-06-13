@@ -52,6 +52,13 @@ const getTomorrowDate = () => {
   return tomorrow;
 };
 
+const getTomorrowLocalDate = () => {
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  tomorrow.setHours(0, 0, 0, 0);
+  return tomorrow;
+};
+
 export function CreateChallenge() {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -168,7 +175,7 @@ export function CreateChallenge() {
                           value={field.value}
                           onChange={field.onChange}
                           placeholder="Select start date"
-                          disabledDates={(date) => date < getTomorrowDate()}
+                          disabledDates={(date) => date < getTomorrowLocalDate()}
                         />
                       </FormControl>
                       <FormMessage />
