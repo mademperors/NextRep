@@ -23,6 +23,8 @@ export default [
       // index('routes/training-list.tsx'),
       route('create', 'routes/create-training.tsx'),
     ]),
+
+    ...prefix('friends', [index('routes/friends.tsx'), route('add', 'routes/add-friend.tsx')]),
   ]),
 ] satisfies RouteConfig;
 

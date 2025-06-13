@@ -23,6 +23,7 @@ export function Navigation() {
                 <NavLink to="/dashboard">Dashboard</NavLink>
                 <NavLink to="/challenges">Challenges</NavLink>
                 <NavLink to="/profile">Profile</NavLink>
+                <NavLink to="/friends">Friends</NavLink>
               </>
             )}
           </>
