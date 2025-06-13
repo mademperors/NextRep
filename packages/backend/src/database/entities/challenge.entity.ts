@@ -61,4 +61,3 @@ export class Challenge {
   })
   enrolled: AccountChallenge[];
 }
-

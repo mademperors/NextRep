@@ -8,6 +8,7 @@ import {
   Matches,
 } from 'class-validator';
 import { ChallengeType } from 'src/common/constants/enums/challenge-types.enum';
+import { AtLeastTomorrow } from 'src/common/validators/at-least-tomorrow.validator';
 
 export class CreateChallengeDto {
   @IsString()
@@ -18,6 +19,7 @@ export class CreateChallengeDto {
 
   @IsDateString()
   @Matches(/^\d{4}-\d{2}-\d{2}$/, { message: 'Date must be in YYYY-MM-DD format' })
+  @AtLeastTomorrow({ message: 'Start date must be at least tomorrow.' })
   startDate: string; // Date string in YYYY-MM-DD format
 
   @IsArray()
