@@ -18,14 +18,8 @@ async function bootstrap() {
   app.useGlobalFilters(new DBExceptionFilter(), new HttpExceptionFilter());
   app.use(cookieParser());
 
-  const allowedOrigins = [
-        'http://localhost:4173',
-        'http://host.docker.internal:4173',
-        'http://127.0.0.1:4173',
-      ];
-
   app.enableCors({
-    origin: allowedOrigins,
+    origin: process.env.CLIENT_URL || 'http://localhost:5173',
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
@@ -51,7 +45,7 @@ async function bootstrap() {
   const port = process.env.PORT ?? 'localhost';
 
   await app.listen(port);
-  console.log(`App is running on ${host}:${port}`);
+  console.log(`App running on ${host}:${port}`);
   console.log(`Swagger docs available at http://${host}:${port}/NextRep/api/docs`);
 }
 bootstrap();
