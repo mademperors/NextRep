@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class Docker1749815897581 implements MigrationInterface {
-    name = 'Docker1749815897581'
+export class Docker1749935348490 implements MigrationInterface {
+    name = 'Docker1749935348490'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`CREATE TYPE "public"."account_accounttype_enum" AS ENUM('member', 'admin')`);

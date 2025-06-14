@@ -30,4 +30,3 @@ export class MigrationsDataSourceConfig extends BasePostgresConfig {
     };
   }
 }
-
