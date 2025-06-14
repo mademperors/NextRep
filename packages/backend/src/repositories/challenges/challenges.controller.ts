@@ -39,6 +39,13 @@ export class ChallengesController {
     return await this.challengesService.getEnrolledChallenges(username);
   }
 
+  @Get('user/:username')
+  async getEnrolledChallengesByUsername(
+    @Param('username') username: string,
+  ): Promise<ResponseChallengeDto[]> {
+    return await this.challengesService.getEnrolledChallenges(username);
+  }
+
   @Get('global')
   async getGlobalChallenges(): Promise<ResponseChallengeDto[]> {
     return await this.challengesService.getGlobalChallenges();
@@ -66,7 +73,7 @@ export class ChallengesController {
   @Post()
   async createChallenge(@Body() dto: CreateChallengeDto, @Req() req: Request): Promise<void> {
     const user = req.user!;
-    await this.challengesService.createChallenge(dto, user.username);
+    await this.challengesService.createChallenge({ ...dto, creator: user.username });
   }
 
   @UseGuards(ChallengeOwnerGuard)
@@ -104,3 +111,4 @@ export class ChallengesController {
     return await this.challengesService.getCompletedDays(id, user.username);
   }
 }
+

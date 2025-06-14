@@ -14,6 +14,9 @@ RUN yarn install
 # Copy the rest of the application files
 COPY . .
 
-#RUN yarn migration:run
+EXPOSE 3000
 
-CMD ["sh", "-c", "yarn migration:run && yarn start:dev"]
+RUN yarn build
+RUN yarn migration:run
+
+CMD [ "yarn", "start" ]

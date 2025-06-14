@@ -1,5 +1,6 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
 import { DBExceptionFilter } from './common/filters/db-exception.filter';
@@ -24,10 +25,28 @@ async function bootstrap() {
     allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
   });
 
+  // Swagger configuration
+  const config = new DocumentBuilder()
+    .setTitle('NextRep API')
+    .setDescription('The NextRep API documentation')
+    .setVersion('1.0')
+    .addTag('NextRep')
+    .addBearerAuth()
+    .build();
+
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('NextRep/api/docs', app, document, {
+    swaggerOptions: {
+      persistAuthorization: true,
+    },
+  });
+
   const host = process.env.HOST ?? 3001;
   const port = process.env.PORT ?? 'localhost';
 
   await app.listen(port);
   console.log(`App running on ${host}:${port}`);
+  console.log(`Swagger docs available at http://${host}:${port}/NextRep/api/docs`);
 }
 bootstrap();
+

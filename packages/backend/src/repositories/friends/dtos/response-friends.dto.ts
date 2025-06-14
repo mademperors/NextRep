@@ -1,3 +1,6 @@
+import { Member } from 'src/database/entities/member.entity';
+
 export class ResponseFriendsDto {
-  friendUsernames: string[];
+  friends: Omit<Member, 'friends' | 'password'>[];
 }
+

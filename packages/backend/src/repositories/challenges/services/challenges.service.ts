@@ -10,7 +10,7 @@ import { ResponsePublicMemberDto } from 'src/repositories/accounts/members/dtos/
 import { ResponseTrainingDto } from 'src/repositories/trainings/dtos/response-training.dto';
 import { TrainingsService } from 'src/repositories/trainings/services/training.service';
 import { Repository } from 'typeorm';
-import { CreateChallengeDto, CreateChallengeDtoWithCreator } from '../dto/create-challenge.dto';
+import { CreateChallengeDtoWithCreator } from '../dto/create-challenge.dto';
 import { ResponseChallengeDto } from '../dto/response-challenge.dto';
 import { UpdateChallengeDto } from '../dto/update-challenge.dto';
 import { ChallengesCrudRepository } from './challenges-crud.repository';
@@ -40,8 +40,7 @@ export class ChallengesService {
     });
     return challenges.map((challenge) => {
       const mappedChallenge = this.mapChallengeToResponseDto(challenge);
-      // Manually delete the property for this specific endpoint's output
-      delete mappedChallenge.enrolledUsernames;
+
       return mappedChallenge;
     });
   }
@@ -74,22 +73,10 @@ export class ChallengesService {
     }));
   }
 
-  async createChallenge(dto: CreateChallengeDto, creator: string): Promise<void> {
-    const fullDto: CreateChallengeDtoWithCreator = { ...dto, creator };
-    const startDate = new Date(dto.startDate + 'T00:00:00Z');
-
-    const now = new Date();
-    const tomorrow = new Date(
-      Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1, 0, 0, 0, 0),
-    );
-
-    if (startDate < tomorrow) {
-      throw new BadRequestException('Challenge start date must be at least tomorrow (UTC)');
-    }
-
+  async createChallenge(dto: CreateChallengeDtoWithCreator): Promise<void> {
     // Additional validation using the account repository
-    await this.accountRepository.validateChallengeCreation(fullDto.creator, dto.challengeType);
-    await this.challengesCrudRepository.create(fullDto);
+    await this.accountRepository.validateChallengeCreation(dto.creator, dto.challengeType);
+    await this.challengesCrudRepository.create(dto);
   }
 
   async updateChallenge(
@@ -127,13 +114,6 @@ export class ChallengesService {
           );
         }
       }
-    }
-
-    const updateData: Partial<UpdateChallengeDto> = { ...dto };
-    if (dto.startDate !== undefined) {
-      const startDate = new Date(dto.startDate);
-      startDate.setHours(5, 59, 0, 0); // Set to 5:59:00 AM
-      updateData.startDate = startDate.toISOString();
     }
 
     await this.challengesCrudRepository.update(id, dto);
@@ -186,6 +166,7 @@ export class ChallengesService {
       challengeType: challenge.challengeType,
       duration: challenge.duration,
       currentDay: challenge.currentDay,
+      startDate: challenge.startDate.toISOString(),
       creator: challenge.creator.username,
       trainingIds: challenge.trainings ? challenge.trainings.map((training) => training.id) : [],
       enrolledUsernames: challenge.enrolled
@@ -212,6 +193,7 @@ export class ChallengesService {
       relations: ['challenge'],
     });
 
+    console.log(accountChallenge);
     const currentDay = accountChallenge.challenge.currentDay;
     if (currentDay <= 0 || currentDay > accountChallenge.challenge.duration) {
       throw new ForbiddenException('Invalid current day for challenge');
@@ -242,3 +224,4 @@ export class ChallengesService {
     return record.completedDays;
   }
 }
+

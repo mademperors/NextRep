@@ -23,11 +23,11 @@ export class FriendsRepository {
     }
 
     const responce: ResponseFriendsDto = {
-      friendUsernames: [],
+      friends: [],
     };
     member?.friends?.forEach((friend) => {
-      if (!responce.friendUsernames.includes(friend.username)) {
-        responce.friendUsernames.push(friend.username);
+      if (!responce.friends.find((f) => f.username === friend.username)) {
+        responce.friends.push(friend);
       }
     });
 
@@ -38,8 +38,9 @@ export class FriendsRepository {
 
       if (friendToAdd) {
         if (!member?.friends?.includes(friendToAdd)) {
-          member?.friends?.push(friendToAdd);
-          responce.friendUsernames.push(friendToAdd.username);
+          const { friends: _, ...friendToAddWithoutFriends } = friendToAdd;
+          member?.friends?.push(friendToAddWithoutFriends);
+          responce.friends.push(friendToAddWithoutFriends);
         }
       }
     });
@@ -54,13 +55,12 @@ export class FriendsRepository {
       relations: ['friends'],
     });
 
-    const friendUsernames = member?.friends?.map((friend) => friend.username) || [];
     return {
-      friendUsernames: friendUsernames,
+      friends: member?.friends || [],
     };
   }
 
-  async remove(memberUsername: string, friendUsername: string): Promise<ResponseFriendsDto> {
+  async remove(memberUsername: string, friendUsername: string): Promise<void> {
     const member = await this.memberRepository.findOne({
       where: { username: memberUsername },
       relations: ['friends'],
@@ -73,25 +73,18 @@ export class FriendsRepository {
     if (member) {
       await this.memberRepository.save(member);
     }
-    return {
-      friendUsernames: [friendUsername],
-    };
   }
 
-  async removeAll(username: string): Promise<ResponseFriendsDto> {
+  async removeAll(username: string): Promise<void> {
     const member = await this.memberRepository.findOne({
       where: { username },
       relations: ['friends'],
     });
 
-    const friendToDelete = member?.friends?.map((friend) => friend.username) || [];
-
     if (member) {
       member.friends = [];
       await this.memberRepository.save(member);
     }
-    return {
-      friendUsernames: friendToDelete,
-    };
   }
 }
+

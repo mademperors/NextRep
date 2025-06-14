@@ -1,22 +1,27 @@
-FROM node:20-alpine AS development-dependencies-env
-COPY . /app
+# 1. Install dependencies
+FROM node:20-alpine AS deps
 WORKDIR /app
+COPY package.json yarn.lock ./
 RUN yarn install --frozen-lockfile
 
-FROM node:20-alpine AS production-dependencies-env
-COPY ./package.json ./yarn.lock /app/
+# 2. Build the SSR app
+FROM node:20-alpine AS build
 WORKDIR /app
-RUN yarn install --frozen-lockfile --production
-
-FROM node:20-alpine AS build-env
-COPY . /app/
-COPY --from=development-dependencies-env /app/node_modules /app/node_modules
-WORKDIR /app
+COPY . .
+COPY --from=deps /app/node_modules ./node_modules
 RUN yarn build
 
+# 3. Production image
 FROM node:20-alpine
-COPY ./package.json ./yarn.lock /app/
-COPY --from=production-dependencies-env /app/node_modules /app/node_modules
-COPY --from=build-env /app/build /app/build
 WORKDIR /app
+
+# Copy only what's needed for runtime
+COPY package.json yarn.lock ./
+COPY --from=deps /app/node_modules ./node_modules
+COPY --from=build /app/build ./build
+
+# Expose the SSR server port (default 5173, adjust if needed)
+EXPOSE 5173
+
+# Start the SSR server
 CMD ["yarn", "start"]

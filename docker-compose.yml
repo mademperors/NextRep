@@ -2,36 +2,27 @@ services:
   postgres:
     image: postgres:17
     container_name: nextrep-pg
+    env_file: .env.docker
     ports:
-      - ${DB_PORT}:5432
-    environment:
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: ${DB_NAME}
+      - 5432:5432
     volumes:
       - pg_data:/var/lib/postgres/data
 
-  # frontend:
-  #   build:
-  #     context: ./packages/frontend
-  #     dockerfile: Dockerfile
-  #   env_file:
-  #     - ./packages/frontend/.env
-  #   ports:
-  #     - '5173:5173'
+  frontend:
+    build:
+      context: ./packages/frontend
+      dockerfile: Dockerfile
+    env_file: .env.docker
+    ports:
+      - 5173:5173
 
   backend:
     build:
       context: ./packages/backend
       dockerfile: Dockerfile
-    env_file:
-      - ./packages/backend/.env
+    env_file: .env.docker
     ports:
-      - '${PORT}:3000'
-    environment:
-      - HOST=0.0.0.0
-      - DB_HOST=postgres
-      - DB_PORT=5432
+      - 3000:3000
     depends_on:
       - postgres
 
