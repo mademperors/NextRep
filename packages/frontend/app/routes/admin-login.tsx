@@ -1,4 +1,4 @@
-import { LoginForm } from '~/components/login-form';
+import { LoginForm } from '~/components/auth/login-form';
 import { Role } from '~/constants/enums/roles.enum';
 import type { Route } from './+types/login';
 
@@ -16,3 +16,4 @@ export default function Login() {
     </div>
   );
 }
+

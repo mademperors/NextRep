@@ -7,10 +7,11 @@ const apiFetch = async (url: string, options: RequestInit) => {
   });
 
   if (!response.ok) {
-    throw new Error('Failed to fetch', { cause: response });
+    throw new Error(`Failed to fetch ${url}: ${response.statusText}`, { cause: response });
   }
 
   return response;
 };
 
 export default apiFetch;
+

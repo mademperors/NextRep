@@ -17,12 +17,19 @@ export function RegisterForm({
   ...props
 }: React.ComponentPropsWithoutRef<'div'> & { role: Role }) {
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const mutation = useMutation({
-    mutationFn: ({ email, password, role }: { email: string; password: string; role: Role }) =>
-      register(email, password, role),
+    mutationFn: ({
+      username,
+      password,
+      role,
+    }: {
+      username: string;
+      password: string;
+      role: Role;
+    }) => register(username, password, role),
     onSuccess: () => {
       toast.success('Account created successfully');
       const loginPath = role === Role.ADMIN ? '/admin/login' : '/login';
@@ -41,7 +48,7 @@ export function RegisterForm({
       return;
     }
 
-    await mutation.mutateAsync({ email, password, role });
+    await mutation.mutateAsync({ username, password, role });
   };
 
   return (
@@ -55,15 +62,15 @@ export function RegisterForm({
           <form onSubmit={handleSubmit}>
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="username">Username</Label>
                 <Input
-                  id="email"
-                  type="email"
-                  placeholder="m@example.com"
+                  id="username"
+                  type="text"
+                  placeholder="john_doe"
                   required
-                  value={email}
-                  autoComplete="email"
-                  onChange={(e) => setEmail(e.target.value)}
+                  value={username}
+                  autoComplete="username"
+                  onChange={(e) => setUsername(e.target.value)}
                 />
               </div>
               <div className="grid gap-2">
@@ -111,3 +118,4 @@ export function RegisterForm({
     </div>
   );
 }
+
