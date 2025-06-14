@@ -17,6 +17,7 @@ COPY . .
 EXPOSE 3000
 
 RUN yarn build
-RUN yarn migration:run
+# RUN yarn migration:run
 
-CMD [ "yarn", "start" ]
+# CMD [ "yarn", "start" ]
+CMD ["sh", "-c", "yarn migration:run && yarn start:dev"]
