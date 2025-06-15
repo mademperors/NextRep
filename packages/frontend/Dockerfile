@@ -7,6 +7,12 @@ RUN yarn install --frozen-lockfile
 # 2. Build the SSR app
 FROM node:20-alpine AS build
 WORKDIR /app
+
+# Accept build arguments for environment variables
+ARG VITE_API_URL
+# Set environment variables for Vite build
+ENV VITE_API_URL=$VITE_API_URL
+
 COPY . .
 COPY --from=deps /app/node_modules ./node_modules
 RUN yarn build
