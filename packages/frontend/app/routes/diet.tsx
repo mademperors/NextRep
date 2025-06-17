@@ -19,6 +19,7 @@ export default function DietPage() {
   } = useQuery({
     queryKey: ['dietRecommendation'],
     queryFn: getDietRecommendation,
+    retry: false,
   });
 
   if (isLoading) {
