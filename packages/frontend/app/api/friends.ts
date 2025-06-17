@@ -29,7 +29,7 @@ export const getFriends = async (): Promise<FriendsResponse> => {
 
   const data = await response.json();
 
-  return FriendsResponseSchema.parse(data);
+  return data;
 };
 
 export const addNewFriends = async (newFriendUsernames: string[]): Promise<void> => {
