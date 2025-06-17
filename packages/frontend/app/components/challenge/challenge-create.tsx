@@ -46,13 +46,14 @@ const createChallengeDtoSchema = z.object({
 export type CreateChallengeDto = z.infer<typeof createChallengeDtoSchema>;
 
 interface CreateChallengeProps {
+  submitText: string;
   onSubmit: (data: CreateChallenge) => void;
   initialData?: Omit<CreateChallenge, 'trainingIds'> & {
     trainingIds: (number | undefined)[];
   };
 }
 
-export function CreateChallenge({ onSubmit, initialData }: CreateChallengeProps) {
+export function CreateChallenge({ submitText, onSubmit, initialData }: CreateChallengeProps) {
   const { user } = useAuth();
   const [currentDay, setCurrentDay] = useState(0);
   const { data: trainings } = useSuspenseQuery({
@@ -247,7 +248,7 @@ export function CreateChallenge({ onSubmit, initialData }: CreateChallengeProps)
           </Card>
 
           <div className="flex justify-end space-x-4">
-            <Button type="submit">Create Challenge</Button>
+            <Button type="submit">{submitText}</Button>
           </div>
         </form>
       </Form>

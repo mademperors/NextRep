@@ -50,7 +50,11 @@ export default function CreateChallengePage() {
 
   return (
     <div className="flex flex-col gap-4 py-4 px-8">
-      <CreateChallenge onSubmit={onSubmit} initialData={initialData} />
+      <CreateChallenge
+        submitText="Create Challenge"
+        onSubmit={onSubmit}
+        initialData={initialData}
+      />
     </div>
   );
 }
