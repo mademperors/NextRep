@@ -13,7 +13,7 @@ export class BasePostgresConfig {
   constructor() {
     this.host = process.env.POSTGRES_HOST ?? 'localhost';
     this.port = Number(process.env.POSTGRES_PORT) || 5432;
-    this.username = process.env.POSTGRES_USER || '';
+    this.username = process.env.POSTGRES_USER || 'postgres';
     this.password = process.env.POSTGRES_PASSWORD || 'password';
     this.database = process.env.POSTGRES_DB ?? 'nextrep';
     this.synchronize = false;
