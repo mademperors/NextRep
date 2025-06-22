@@ -61,8 +61,26 @@ export class FriendsRepository {
       throw new NotFoundException('Friend request not found');
     }
 
-    const member = friendRequest.receiver;
-    const friend = friendRequest.sender;
+    const memberUsername = friendRequest.receiverUsername;
+    const friendUsername = friendRequest.senderUsername;
+
+    const member = await this.memberRepository.findOne({
+      where: { username: memberUsername },
+      relations: ['friends'],
+    });
+
+    if (!member) {
+      throw new NotFoundException('Member not found');
+    }
+
+    const friend = await this.memberRepository.findOne({
+      where: { username: friendUsername },
+      relations: ['friends'],
+    });
+
+    if (!friend) {
+      throw new NotFoundException('Friend not found');
+    }
 
     if (member.friends?.find((f) => f.username === friend.username)) {
       throw new BadRequestException('Friend already exists');
