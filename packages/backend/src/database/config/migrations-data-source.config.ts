@@ -5,6 +5,7 @@ import { Account } from '../entities/account.entity';
 import { Achivement } from '../entities/achivement.entity';
 import { Admin } from '../entities/admin.entity';
 import { Challenge } from '../entities/challenge.entity';
+import { FriendRequest } from '../entities/friend-request.entity';
 import { Member } from '../entities/member.entity';
 import { Training } from '../entities/training.entity';
 import { BasePostgresConfig } from './base-postgres.config';
@@ -16,7 +17,7 @@ export class MigrationsDataSourceConfig extends BasePostgresConfig {
 
   constructor() {
     super();
-    this.entities = [Account, Challenge, AccountChallenge, Member, Training, Admin, Achivement];
+    this.entities = [Account, Challenge, AccountChallenge, Member, Training, Admin, Achivement, FriendRequest];
     this.migrations = ['src/database/migrations/docker/*.ts'];
     this.migrationsRun = false;
   }
