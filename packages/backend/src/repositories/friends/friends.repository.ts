@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FriendRequest } from 'src/database/entities/friend-request.entity';
 import { Member } from 'src/database/entities/member.entity';
@@ -16,23 +16,13 @@ export class FriendsRepository {
   ) { }
 
   async createFriendRequest(username: string, friendRequest: FriendRequestDto): Promise<void> {
-    const member = await this.memberRepository.findOne({
+    const member = await this.memberRepository.findOneOrFail({
       where: { username },
     });
 
-    const friend = await this.memberRepository.findOne({
+    const friend = await this.memberRepository.findOneOrFail({
       where: { username: friendRequest.friendUsername },
     });
-
-    if (!member) {
-      console.log('Member not found');
-      throw new NotFoundException('Member not found');
-    }
-
-    if (!friend) {
-      console.log('Friend not found');
-      throw new NotFoundException('Friend not found');
-    }
 
     const existingRequest = await this.friendRequestRepository.findOne({
       where: [
@@ -52,35 +42,23 @@ export class FriendsRepository {
   }
 
   async acceptFriendRequest(username: string, friendRequestDto: HandleFriendRequestDto): Promise<void> {
-    const friendRequest = await this.friendRequestRepository.findOne({
+    const friendRequest = await this.friendRequestRepository.findOneOrFail({
       where: { id: friendRequestDto.requestId },
       relations: ['sender', 'receiver'],
     });
 
-    if (!friendRequest) {
-      throw new NotFoundException('Friend request not found');
-    }
-
     const memberUsername = friendRequest.receiverUsername;
     const friendUsername = friendRequest.senderUsername;
 
-    const member = await this.memberRepository.findOne({
+    const member = await this.memberRepository.findOneOrFail({
       where: { username: memberUsername },
       relations: ['friends'],
     });
 
-    if (!member) {
-      throw new NotFoundException('Member not found');
-    }
-
-    const friend = await this.memberRepository.findOne({
+    const friend = await this.memberRepository.findOneOrFail({
       where: { username: friendUsername },
       relations: ['friends'],
     });
-
-    if (!friend) {
-      throw new NotFoundException('Friend not found');
-    }
 
     if (member.friends?.find((f) => f.username === friend.username)) {
       throw new BadRequestException('Friend already exists');
