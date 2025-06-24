@@ -28,7 +28,11 @@ export default [
       route('create', 'routes/create-training.tsx'),
     ]),
 
-    ...prefix('friends', [index('routes/friends.tsx'), route('add', 'routes/add-friend.tsx')]),
+    ...prefix('friends', [
+      index('routes/friends.tsx'),
+      route('add', 'routes/add-friend.tsx'),
+      route('requests', 'routes/friend-requests.tsx'),
+    ]),
 
     ...prefix('diet', [index('routes/diet.tsx')]),
   ]),

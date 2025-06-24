@@ -1,13 +1,85 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { FriendRequest } from 'src/database/entities/friend-request.entity';
 import { Member } from 'src/database/entities/member.entity';
 import { Repository } from 'typeorm';
 import { AddNewFriendsDto } from './dtos/add-new-friends.dto';
+import { FriendRequestDto } from './dtos/friend-request.dto';
+import { HandleFriendRequestDto } from './dtos/handle-friend-request.dto';
 import { ResponseFriendsDto } from './dtos/response-friends.dto';
 
 @Injectable()
 export class FriendsRepository {
-  constructor(@InjectRepository(Member) private readonly memberRepository: Repository<Member>) {}
+  constructor(
+    @InjectRepository(Member) private readonly memberRepository: Repository<Member>,
+    @InjectRepository(FriendRequest) private readonly friendRequestRepository: Repository<FriendRequest>,
+  ) { }
+
+  async createFriendRequest(username: string, friendRequest: FriendRequestDto): Promise<void> {
+    const member = await this.memberRepository.findOneOrFail({
+      where: { username },
+    });
+
+    const friend = await this.memberRepository.findOneOrFail({
+      where: { username: friendRequest.friendUsername },
+    });
+
+    const existingRequest = await this.friendRequestRepository.findOne({
+      where: [
+        { senderUsername: member.username, receiverUsername: friend.username },
+        { senderUsername: friend.username, receiverUsername: member.username }
+      ]
+    });
+
+    if (existingRequest) {
+      throw new BadRequestException('Friend request already exists');
+    }
+
+    const newFriendRequest = new FriendRequest();
+    newFriendRequest.sender = member;
+    newFriendRequest.receiver = friend;
+    await this.friendRequestRepository.save(newFriendRequest);
+  }
+
+  async acceptFriendRequest(username: string, friendRequestDto: HandleFriendRequestDto): Promise<void> {
+    const friendRequest = await this.friendRequestRepository.findOneOrFail({
+      where: { id: friendRequestDto.requestId },
+      relations: ['sender', 'receiver'],
+    });
+
+    const memberUsername = friendRequest.receiverUsername;
+    const friendUsername = friendRequest.senderUsername;
+
+    const member = await this.memberRepository.findOneOrFail({
+      where: { username: memberUsername },
+      relations: ['friends'],
+    });
+
+    const friend = await this.memberRepository.findOneOrFail({
+      where: { username: friendUsername },
+      relations: ['friends'],
+    });
+
+    if (member.friends?.find((f) => f.username === friend.username)) {
+      throw new BadRequestException('Friend already exists');
+    }
+
+    member.friends = [...(member.friends || []), friend];
+    friend.friends = [...(friend.friends || []), member];
+    await this.memberRepository.save(member);
+    await this.memberRepository.save(friend);
+    await this.friendRequestRepository.delete(friendRequest.id);
+  }
+
+  async rejectFriendRequest(username: string, friendRequestDto: HandleFriendRequestDto): Promise<void> {
+    await this.friendRequestRepository.delete(friendRequestDto.requestId);
+  }
+
+  async getFriendRequests(username: string): Promise<FriendRequest[]> {
+    return await this.friendRequestRepository.find({
+      where: { receiverUsername: username },
+    });
+  }
 
   async update(
     username: string,

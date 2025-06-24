@@ -22,6 +22,64 @@ export const FriendsResponseSchema = z.object({
 export type FriendMember = z.infer<typeof MemberSchema>;
 export type FriendsResponse = z.infer<typeof FriendsResponseSchema>;
 
+export const CreateFriendRequestSchema = z.object({
+  friendUsername: z.string(),
+});
+
+export const HandleFriendRequestSchema = z.object({
+  requestId: z.number(),
+});
+
+export const FriendRequestResponseSchema = z.object({
+  id: z.number(),
+  senderUsername: z.string(),
+  receiverUsername: z.string(),
+  message: z.string().optional().nullable(),
+  createdAt: z.date(),
+});
+
+export type CreateFriendRequest = z.infer<typeof CreateFriendRequestSchema>;
+export type HandleFriendRequest = z.infer<typeof HandleFriendRequestSchema>;
+export type FriendRequest = z.infer<typeof FriendRequestResponseSchema>;
+
+export const createFriendRequest = async (friendRequest: CreateFriendRequest): Promise<void> => {
+  await apiFetch('/friends/friend-request', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(friendRequest),
+  });
+};
+
+export const acceptFriendRequest = async (friendRequest: HandleFriendRequest): Promise<void> => {
+  await apiFetch('/friends/friend-request/accept', {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(friendRequest),
+  });
+};
+
+export const rejectFriendRequest = async (friendRequest: HandleFriendRequest): Promise<void> => {
+  await apiFetch('/friends/friend-request/reject', {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(friendRequest),
+  });
+};
+
+export const getFriendRequests = async (): Promise<FriendRequest[]> => {
+  const response = await apiFetch('/friends/friend-requests', {
+    method: 'GET',
+  });
+
+  return response.json();
+};
+
 export const getFriends = async (): Promise<FriendsResponse> => {
   const response = await apiFetch('/friends', {
     method: 'GET',
